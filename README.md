@@ -4,6 +4,14 @@ Interactive team task board for the NewGen Growth Ecosystem. Tracks department k
 
 **Live:** https://lucalinkai.github.io/newgen-taskboard/
 
+## Ecosystem
+
+![NewGen Growth Ecosystem Map](assets/ecosystem-map.png)
+
+## Team
+
+![NewGen Team Structure](assets/team-structure.png)
+
 ## Using the board
 
 | Action | How |
