@@ -114,13 +114,43 @@ body:not(.edit-mode) .keytask-text{pointer-events:none;user-select:none;cursor:d
 body.edit-mode .cover-btn#editBtn{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.5);}
 
 /* Save toast */
-#save-toast{position:fixed;bottom:24px;right:24px;background:#1B2B4B;color:#fff;padding:8px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;z-index:1000;}
+#save-toast{position:fixed;bottom:24px;right:24px;background:#1B2B4B;color:#fff;padding:8px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;z-index:3000;}
 #save-toast.show{opacity:1;}
+
+/* History panel */
+#history-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:2000;opacity:0;pointer-events:none;transition:opacity .25s;}
+#history-backdrop.open{opacity:1;pointer-events:auto;}
+#history-panel{position:fixed;top:0;right:0;height:100%;width:320px;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.14);z-index:2001;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;font-family:'DM Sans',sans-serif;}
+#history-panel.open{transform:translateX(0);}
+.hp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.hp-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--text);}
+.hp-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:0 2px;}
+.hp-close:hover{color:var(--text);}
+.hp-list{flex:1;overflow-y:auto;padding:8px 0;}
+.hp-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);}
+.hp-item:last-child{border-bottom:none;}
+.hp-item.current{background:#EEF2FA;}
+.hp-info{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.hp-ver{font-size:13px;font-weight:600;color:var(--text);}
+.hp-ts{font-size:11px;color:var(--muted);}
+.hp-badge{font-size:9px;padding:1px 6px;border-radius:3px;background:#1B2B4B;color:#fff;font-weight:500;display:inline-block;margin-top:1px;}
+.hp-rollback-btn{background:#1B2B4B;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.hp-rollback-btn:hover{background:#2d4270;}
+.hp-rollback-btn:disabled{opacity:.5;cursor:default;}
+.hp-msg{padding:32px 20px;font-size:13px;color:var(--muted);text-align:center;line-height:1.6;}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div id="save-toast">已保存 ✓</div>
+<div id="history-backdrop" data-act="closeHistory"></div>
+<div id="history-panel">
+  <div class="hp-header">
+    <span class="hp-title">版本历史</span>
+    <button class="hp-close" data-act="closeHistory">×</button>
+  </div>
+  <div class="hp-list"><p class="hp-msg">加载中...</p></div>
+</div>
 <script>
 const PRI = {
   urgent:   {l:'6/15前', bg:'#FDECEA', c:'#C0392B'},
@@ -328,6 +358,7 @@ function rPage(){
     <button class="cover-btn" id="editBtn" data-act="editToggle">✏ 编辑</button>
     <button class="cover-btn" data-act="exportHtml">↓ 导出</button>
     <button class="cover-btn" id="publishBtn" data-act="publishGH">☁ 发布</button>
+    <button class="cover-btn" data-act="openHistory">🕐 历史</button>
     <button class="cover-btn" data-act="reset">↺ 重置数据</button>
   </div>
   <div class="cover-label">NewGen Growth Ecosystem · 内部工作文件</div>
@@ -400,6 +431,11 @@ document.addEventListener('click',function(e){
     if(e.shiftKey){localStorage.removeItem('ng-gh-token');alert('GitHub token cleared.');return;}
     publishToGitHub();return;
   }
+
+  // Version history
+  if(act==='openHistory'){openHistory();return;}
+  if(act==='closeHistory'){closeHistory();return;}
+  if(act==='rollback'){rollbackTo(el.dataset.path,el.dataset.ver,el);return;}
 
   // Reset
   if(act==='reset'){
@@ -600,9 +636,31 @@ function toBase64Utf8(str){
   return btoa(bin);
 }
 
+const REPO='LucaLinkAI/newgen-taskboard';
+
+function ghHeaders(){
+  const token=localStorage.getItem('ng-gh-token');
+  return token?{'Authorization':'Bearer '+token,'Content-Type':'application/json'}:null;
+}
+
+async function ghGet(path){
+  const h=ghHeaders();if(!h)throw new Error('No token');
+  const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{headers:h});
+  if(!r.ok)throw new Error('GitHub '+r.status+' '+r.statusText);
+  return r.json();
+}
+
+async function ghPut(path,content64,sha,message){
+  const h=ghHeaders();if(!h)throw new Error('No token');
+  const body={message,content:content64};
+  if(sha)body.sha=sha;
+  const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{method:'PUT',headers:h,body:JSON.stringify(body)});
+  if(!r.ok){const e=await r.json();throw new Error(e.message||r.status);}
+  return r.json();
+}
+
 async function publishToGitHub(){
   const btn=document.getElementById('publishBtn');
-  const REPO='LucaLinkAI/newgen-taskboard';
 
   let token=localStorage.getItem('ng-gh-token');
   if(!token){
@@ -615,19 +673,20 @@ async function publishToGitHub(){
   data.version=bumpVersion(data.version);
   save();
   const html=buildExportHtml();
+  const content64=toBase64Utf8(html);
+
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 
   if(btn){btn.textContent='⏳ 发布中...';btn.style.opacity='.6';}
   try{
-    const headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'};
-    const getRes=await fetch(`https://api.github.com/repos/${REPO}/contents/index.html`,{headers});
-    if(!getRes.ok) throw new Error('GitHub '+getRes.status+': '+getRes.statusText);
-    const {sha}=await getRes.json();
+    // Update index.html
+    const {sha}=await ghGet('index.html');
+    await ghPut('index.html',content64,sha,`publish v${data.version}`);
 
-    const putRes=await fetch(`https://api.github.com/repos/${REPO}/contents/index.html`,{
-      method:'PUT',headers,
-      body:JSON.stringify({message:`publish v${data.version}`,content:toBase64Utf8(html),sha})
-    });
-    if(!putRes.ok){const e=await putRes.json();throw new Error(e.message||putRes.status);}
+    // Archive to versions/
+    await ghPut(`versions/v${data.version}_${stamp}.html`,content64,null,`archive v${data.version}`);
 
     if(btn){btn.textContent='✓ 已发布';btn.style.opacity='';setTimeout(()=>{btn.textContent='☁ 发布';},3000);}
     showToast('已推送 GitHub ✓');
@@ -635,6 +694,94 @@ async function publishToGitHub(){
     console.error(err);
     if(btn){btn.textContent='✗ 失败';btn.style.opacity='';setTimeout(()=>{btn.textContent='☁ 发布';},3000);}
     alert('发布失败: '+err.message);
+  }
+}
+
+// ── Version history ──────────────────────────
+function formatStamp(s){
+  // s = '20260605-143022'
+  const y=s.slice(0,4),mo=parseInt(s.slice(4,6)),d=parseInt(s.slice(6,8));
+  const h=s.slice(9,11),mi=s.slice(11,13);
+  return `${y}年${mo}月${d}日 ${h}:${mi}`;
+}
+
+function openHistory(){
+  document.getElementById('history-panel').classList.add('open');
+  document.getElementById('history-backdrop').classList.add('open');
+  loadHistory();
+}
+
+function closeHistory(){
+  document.getElementById('history-panel').classList.remove('open');
+  document.getElementById('history-backdrop').classList.remove('open');
+}
+
+async function loadHistory(){
+  const list=document.querySelector('#history-panel .hp-list');
+  list.innerHTML='<p class="hp-msg">加载中...</p>';
+
+  if(!localStorage.getItem('ng-gh-token')){
+    list.innerHTML='<p class="hp-msg">请先配置 GitHub Token<br>（点击 ☁ 发布 输入）</p>';
+    return;
+  }
+
+  try{
+    let files;
+    try{files=await ghGet('versions');}
+    catch(e){
+      if(e.message.includes('404')){list.innerHTML='<p class="hp-msg">暂无历史版本<br>发布后自动归档</p>';return;}
+      throw e;
+    }
+
+    if(!Array.isArray(files)||files.length===0){
+      list.innerHTML='<p class="hp-msg">暂无历史版本</p>';return;
+    }
+
+    const current=data.version||'1.0.0';
+    files.sort((a,b)=>b.name.localeCompare(a.name));
+
+    list.innerHTML=files.map(f=>{
+      const m=f.name.match(/v(\d+\.\d+\.\d+)_(\d{8}-\d{6})/);
+      const ver=m?m[1]:f.name.replace('.html','');
+      const ts=m?formatStamp(m[2]):'';
+      const isCurrent=ver===current;
+      return `<div class="hp-item${isCurrent?' current':''}">
+  <div class="hp-info">
+    <span class="hp-ver">v${ver}</span>
+    ${ts?`<span class="hp-ts">${ts}</span>`:''}
+    ${isCurrent?'<span class="hp-badge">当前版本</span>':''}
+  </div>
+  <button class="hp-rollback-btn" data-act="rollback" data-path="${f.path}" data-ver="${ver}"${isCurrent?' disabled':''}>
+    ${isCurrent?'当前':'回滚'}
+  </button>
+</div>`;
+    }).join('');
+  }catch(err){
+    list.innerHTML=`<p class="hp-msg">加载失败<br>${err.message}</p>`;
+  }
+}
+
+async function rollbackTo(path,ver,btn){
+  if(!confirm(`确定回滚到 v${ver}？\n\n这将覆盖当前线上版本并触发重新部署。`))return;
+
+  btn.textContent='回滚中...';btn.disabled=true;
+  try{
+    // Fetch old version (content is base64 from GitHub API)
+    const vData=await ghGet(path);
+    const content64=vData.content.replace(/\n/g,'');
+
+    // Get current index.html SHA
+    const {sha}=await ghGet('index.html');
+
+    await ghPut('index.html',content64,sha,`rollback to v${ver}`);
+
+    btn.textContent='✓ 已回滚';
+    showToast(`已回滚到 v${ver} ✓`);
+    // Refresh list to reflect new current (decode version from content)
+    setTimeout(loadHistory,800);
+  }catch(err){
+    btn.textContent='回滚';btn.disabled=false;
+    alert('回滚失败: '+err.message);
   }
 }
 
