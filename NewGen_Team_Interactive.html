@@ -141,6 +141,7 @@ body.edit-mode .cover-btn#editBtn{background:rgba(255,255,255,.28);border-color:
 </style>
 </head>
 <body>
+<script src="config.local.js" onerror="void 0"></script>
 <div id="app"></div>
 <div id="save-toast">已保存 ✓</div>
 <div id="history-backdrop" data-act="closeHistory"></div>
@@ -427,10 +428,7 @@ document.addEventListener('click',function(e){
   if(act==='exportHtml'){exportHtml();return;}
 
   // Publish to GitHub (Shift+click to reset stored token)
-  if(act==='publishGH'){
-    if(e.shiftKey){localStorage.removeItem('ng-gh-token');alert('GitHub token cleared.');return;}
-    publishToGitHub();return;
-  }
+  if(act==='publishGH'){publishToGitHub();return;}
 
   // Version history
   if(act==='openHistory'){openHistory();return;}
@@ -662,13 +660,8 @@ async function ghPut(path,content64,sha,message){
 async function publishToGitHub(){
   const btn=document.getElementById('publishBtn');
 
-  let token=localStorage.getItem('ng-gh-token');
-  if(!token){
-    token=prompt('GitHub Personal Access Token\n(needs Contents: Read & Write on '+REPO+')\n\nShift+click ☁ 发布 to reset the token.');
-    if(!token)return;
-    localStorage.setItem('ng-gh-token',token.trim());
-    token=token.trim();
-  }
+  const token=localStorage.getItem('ng-gh-token');
+  if(!token){alert('GitHub token not found.\nAdd it to config.local.js and reload.');return;}
 
   data.version=bumpVersion(data.version);
   save();
