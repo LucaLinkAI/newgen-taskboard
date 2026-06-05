@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
+<html lang="zh"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NewGen 团队分工规划 · 可编辑版</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&amp;family=DM+Sans:wght@300;400;500&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <style>
 :root {
@@ -114,13 +112,44 @@ body:not(.edit-mode) .keytask-text{pointer-events:none;user-select:none;cursor:d
 body.edit-mode .cover-btn#editBtn{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.5);}
 
 /* Save toast */
-#save-toast{position:fixed;bottom:24px;right:24px;background:#1B2B4B;color:#fff;padding:8px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;z-index:1000;}
+#save-toast{position:fixed;bottom:24px;right:24px;background:#1B2B4B;color:#fff;padding:8px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;z-index:3000;}
 #save-toast.show{opacity:1;}
+
+/* History panel */
+#history-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:2000;opacity:0;pointer-events:none;transition:opacity .25s;}
+#history-backdrop.open{opacity:1;pointer-events:auto;}
+#history-panel{position:fixed;top:0;right:0;height:100%;width:320px;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.14);z-index:2001;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;font-family:'DM Sans',sans-serif;}
+#history-panel.open{transform:translateX(0);}
+.hp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.hp-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--text);}
+.hp-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:0 2px;}
+.hp-close:hover{color:var(--text);}
+.hp-list{flex:1;overflow-y:auto;padding:8px 0;}
+.hp-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);}
+.hp-item:last-child{border-bottom:none;}
+.hp-item.current{background:#EEF2FA;}
+.hp-info{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.hp-ver{font-size:13px;font-weight:600;color:var(--text);}
+.hp-ts{font-size:11px;color:var(--muted);}
+.hp-badge{font-size:9px;padding:1px 6px;border-radius:3px;background:#1B2B4B;color:#fff;font-weight:500;display:inline-block;margin-top:1px;}
+.hp-rollback-btn{background:#1B2B4B;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.hp-rollback-btn:hover{background:#2d4270;}
+.hp-rollback-btn:disabled{opacity:.5;cursor:default;}
+.hp-msg{padding:32px 20px;font-size:13px;color:var(--muted);text-align:center;line-height:1.6;}
 </style>
 </head>
 <body>
+<script src="config.local.js" onerror="void 0"></script>
 <div id="app"></div>
 <div id="save-toast">已保存 ✓</div>
+<div id="history-backdrop" data-act="closeHistory"></div>
+<div id="history-panel">
+  <div class="hp-header">
+    <span class="hp-title">版本历史</span>
+    <button class="hp-close" data-act="closeHistory">×</button>
+  </div>
+  <div class="hp-list"><p class="hp-msg">加载中...</p></div>
+</div>
 <script>
 const PRI = {
   urgent:   {l:'6/15前', bg:'#FDECEA', c:'#C0392B'},
@@ -129,6 +158,7 @@ const PRI = {
   asneeded: {l:'视需要', bg:'#F0EBF8', c:'#5B2D90'}
 };
 const PO = ['urgent','week','ongoing','asneeded'];
+const isLocal = location.protocol==='file:' || location.hostname==='localhost' || location.hostname==='127.0.0.1';
 
 const META = {
   overall:    {color:'#1B2B4B', light:'#EEF2FA', border:'#C5CFEA', icon:'J'},
@@ -138,95 +168,7 @@ const META = {
 };
 
 /*DEF_START*/
-const DEF = {departments:[
-  {id:'overall',label:'总负责人',subtitle:'整体战略统筹 · CBC Advisory Group · 四大支柱对齐',pillar:'P1 P2 P3 P4 全部',
-   keyTasks:['确认各部门6月推广计划，统一对齐6/15上线节奏','CBC Advisory Group 专业转介绍网络启动，制定CPA合作条款','梳理招募目标人群画像：房产经纪人、贷款经纪人、会计师','主持每周例会，驱动跨部门协作，更新agenda与优先级','CBC专家微信群、知识星球内容方向与品质监督'],
-   members:[{id:'joyce',name:'Joyce Liang',role:'CEO · Bay Area',initials:'JL',isLead:true,todos:[
-     {id:'j1',text:'审阅各部门上线前检查清单，给出最终确认',priority:'urgent',done:false},
-     {id:'j2',text:'制定CBC CPA转介绍合作条款草案',priority:'urgent',done:false},
-     {id:'j3',text:'整理招募目标人群画像，分发给Jeff/Nathan',priority:'week',done:false},
-     {id:'j4',text:'确定"科技赋能保险招募"差异化定位的最终表述',priority:'week',done:false},
-     {id:'j5',text:'主持每周例会，更新跨部门任务进度',priority:'ongoing',done:false},
-     {id:'j6',text:'CBC专家微信群维护，线下讲座与专题讲座规划',priority:'ongoing',done:false}
-   ]}]},
-  {id:'tech',label:'Tech 部门',subtitle:'P1 Synova InsureTech · P2 FindInsureWise / EasyRetire',pillar:'P1 P2 主导',
-   keyTasks:['网站上线冲刺：FindInsureWise内容wrap-up，6/15前全部就绪','SEO / GEO / Ads：广告账号开通，SEO基础配置，投放策略启动','Onboarding平台：Chelsea审阅后，将文档统一上传至Notion/网站','AI工具迭代：Proposal Automation · Lead Funnels · LLM知识库持续优化','内部赋能：将AI视频制作流程（ListenHub+Canva）分享给Marketing团队'],
-   members:[
-     {id:'jeff',name:'Jeff Lin',role:'Tech Lead · Seattle',initials:'JL',isLead:true,todos:[
-       {id:'jf1',text:'完成FindInsureWise网站内容wrap-up，全站可上线',priority:'urgent',done:false},
-       {id:'jf2',text:'广告账号开通，SEO基础配置及初始关键词完成',priority:'urgent',done:false},
-       {id:'jf3',text:'分享ListenHub+Canva视频制作流程给Sheever/Iris',priority:'week',done:false},
-       {id:'jf4',text:'审阅Chelsea的Onboarding checklist，补充后上传Notion',priority:'week',done:false},
-       {id:'jf5',text:'确认EasyRetire / Synova AI工具当前版本状态',priority:'week',done:false},
-       {id:'jf6',text:'LLM知识库内容更新，AI Marketing工具功能迭代',priority:'ongoing',done:false}
-     ]},
-     {id:'eric',name:'Eric Zhuang',role:'Tech · Seattle',initials:'EZ',isLead:false,todos:[
-       {id:'ez1',text:'网站上线前技术测试，Lead Funnel页面部署完成',priority:'urgent',done:false},
-       {id:'ez2',text:'广告投放追踪像素（Pixel）配置与验证',priority:'urgent',done:false},
-       {id:'ez3',text:'Proposal Automation功能联调与修复',priority:'week',done:false},
-       {id:'ez4',text:'CRM & Policy Service接口对接测试',priority:'week',done:false},
-       {id:'ez5',text:'Agency Management System迭代，与Jeff协作',priority:'ongoing',done:false},
-       {id:'ez6',text:'站点性能监控，bug修复响应',priority:'ongoing',done:false}
-     ]}
-   ]},
-  {id:'marketing',label:'Marketing 部门',subtitle:'P3 & P4 视频号 / 小红书 / Newsletter / 知识星球',pillar:'P3 P4 内容推广',
-   keyTasks:['视频号双账号：开通招募向+产品向两个账号，首批视频6月中旬上线','平台调研：视频号/小红书金融类开号难度与推广预算可行性评估','推广人员招募：与Ares团队沟通，组织集体面试潜在推广人员','内容合规：建立敏感词规避机制，金融类内容合规审查流程','美区Newsletter：配合网站上线发送首期，双周常态化，跟踪转化'],
-   members:[
-     {id:'iris',name:'Iris Sui',role:'Marketing Lead · China',initials:'IS',isLead:true,todos:[
-       {id:'is1',text:'小红书账号开号可行性评估，提交代理方案',priority:'urgent',done:false},
-       {id:'is2',text:'统筹Marketing部门6月内容日历，对齐上线节奏',priority:'urgent',done:false},
-       {id:'is3',text:'知识星球内容规划，首批3-5篇帖子草稿',priority:'week',done:false},
-       {id:'is4',text:'协助Sheever制定视频内容引流转化策略',priority:'week',done:false},
-       {id:'is5',text:'建立内容合规审查规范，整理敏感词替换方案',priority:'week',done:false},
-       {id:'is6',text:'与国内团队日常沟通，检查内容效果，定期调整策略',priority:'ongoing',done:false},
-       {id:'is7',text:'招聘1-2名视频内容制作助手',priority:'asneeded',done:false}
-     ]},
-     {id:'sheever',name:'Sheever 小泉',role:'Marketing · China',initials:'SQ',isLead:false,todos:[
-       {id:'sq1',text:'调研视频号/小红书金融理财类账号开通难度及推广预算',priority:'urgent',done:false},
-       {id:'sq2',text:'与Iris对接，确认视频内容方向与两个账号定位',priority:'urgent',done:false},
-       {id:'sq3',text:'与Ares团队沟通，安排并组织推广人员集体面试',priority:'week',done:false},
-       {id:'sq4',text:'使用AI工具（ListenHub+Canva）制作招募类视频1条',priority:'week',done:false},
-       {id:'sq5',text:'制作产品类视频1条，发布试水',priority:'week',done:false},
-       {id:'sq6',text:'视频文案合规审查，避免敏感词，使用符号规避',priority:'ongoing',done:false}
-     ]},
-     {id:'yangyang',name:'YangYang',role:'Marketing · Irvine',initials:'YY',isLead:false,todos:[
-       {id:'yy1',text:'配合网站上线，准备并发送首期Newsletter',priority:'urgent',done:false},
-       {id:'yy2',text:'NewGen Circle 微信群欢迎文案及6月活动策划',priority:'week',done:false},
-       {id:'yy3',text:'整理针对房产/贷款/会计师的英文招募触达内容',priority:'week',done:false},
-       {id:'yy4',text:'美区社交媒体内容计划（LinkedIn），与Iris对齐',priority:'week',done:false},
-       {id:'yy5',text:'Newsletter双周发送，跟踪open rate和转化数据',priority:'ongoing',done:false},
-       {id:'yy6',text:'NewGen Circle社群日常维护，活跃度管理',priority:'ongoing',done:false}
-     ]}
-   ]},
-  {id:'backoffice',label:'BackOffice 部门',subtitle:'P3 Agent 招募 / Onboarding / CRM / 运营支持',pillar:'P3 运营落地',
-   keyTasks:['Onboarding全套：为每个环节制作视频+文本说明，上传Notion，形成可复制流程','Agent招募页：topnewgen.com招募信息更新，配合6/15上线','CRM对接：系统数据清理与上线测试，确保新合作伙伴可顺利进入','招募目标名单：整理房产经纪人/贷款经纪人/会计师触达名单','运营SOP：Agency Management System标准操作流程文档，客服响应规范'],
-   members:[
-     {id:'chelsea',name:'Chelsea Zhu',role:'BackOffice Lead · Bay Area',initials:'CZ',isLead:true,todos:[
-       {id:'cz1',text:'为每个Onboarding环节制作视频+文本配套说明',priority:'urgent',done:false},
-       {id:'cz2',text:'统筹BackOffice上线前检查事项，向Joyce汇报',priority:'urgent',done:false},
-       {id:'cz3',text:'整理现有Onboarding checklist，分享给Jeff补充后上传',priority:'week',done:false},
-       {id:'cz4',text:'制作新珍网站、社群工具、培训课程使用引导视频',priority:'week',done:false},
-       {id:'cz5',text:'建立客户服务响应SOP，与Kongkong协作',priority:'week',done:false},
-       {id:'cz6',text:'维护和迭代培训课程内容，与Sheever/Joyce保持同步',priority:'ongoing',done:false}
-     ]},
-     {id:'nathan',name:'Nathan Li',role:'BackOffice · Bay Area',initials:'NL',isLead:false,todos:[
-       {id:'nl1',text:'更新topnewgen.com Agent招募页内容，配合上线',priority:'urgent',done:false},
-       {id:'nl2',text:'NewGen Agency平台Agent招募流程打通',priority:'urgent',done:false},
-       {id:'nl3',text:'整理房产/贷款/会计师目标招募对象名单，提交Joyce',priority:'week',done:false},
-       {id:'nl4',text:'NewGen Circle 微信群分组管理，建立新人欢迎流程',priority:'week',done:false},
-       {id:'nl5',text:'与CBC Advisory Group协作，跟进CPA转介绍系统',priority:'ongoing',done:false},
-       {id:'nl6',text:'新合作伙伴日常支持，跟进入职后体验',priority:'ongoing',done:false}
-     ]},
-     {id:'kongkong',name:'Kongkong',role:'BackOffice · Bay Area',initials:'KK',isLead:false,todos:[
-       {id:'kk1',text:'CRM系统数据清理与上线对接测试完成',priority:'urgent',done:false},
-       {id:'kk2',text:'新合作伙伴账户开通流程测试验证',priority:'urgent',done:false},
-       {id:'kk3',text:'整理Agency Management System标准操作SOP',priority:'week',done:false},
-       {id:'kk4',text:'与Chelsea协作，建立客户服务响应规范文档',priority:'week',done:false},
-       {id:'kk5',text:'Policy Service日常维护，处理客户咨询与问题',priority:'ongoing',done:false},
-       {id:'kk6',text:'后台运营数据汇报，定期向Chelsea更新',priority:'ongoing',done:false}
-     ]}
-   ]}
-]};
+const DEF = {"departments":[{"id":"overall","label":"总负责人","subtitle":"整体战略统筹 · CBC Advisory Group · 四大支柱对齐","pillar":"P1 P2 P3 P4 全部","keyTasks":["确认各部门6月推广计划，统一对齐6/15上线节奏","CBC Advisory Group 专业转介绍网络启动，制定CPA合作条款","梳理招募目标人群画像：房产经纪人、贷款经纪人、会计师","主持每周例会，驱动跨部门协作，更新agenda与优先级","CBC专家微信群、知识星球内容方向与品质监督"],"members":[{"id":"joyce","name":"Joyce Liang","role":"CEO · Bay Area","initials":"JL","isLead":true,"todos":[{"id":"j1","text":"审阅各部门上线前检查清单，给出最终确认","priority":"urgent","done":false},{"id":"j2","text":"制定CBC CPA转介绍合作条款草案","priority":"urgent","done":false},{"id":"j3","text":"整理招募目标人群画像，分发给Jeff/Nathan","priority":"week","done":true},{"id":"j4","text":"确定\"科技赋能保险招募\"差异化定位的最终表述","priority":"week","done":true},{"id":"j5","text":"主持每周例会，更新跨部门任务进度","priority":"ongoing","done":true},{"id":"j6","text":"CBC专家微信群维护，线下讲座与专题讲座规划","priority":"ongoing","done":false}]}]},{"id":"tech","label":"Tech 部门","subtitle":"P1 Synova InsureTech · P2 FindInsureWise / EasyRetire","pillar":"P1 P2 主导","keyTasks":["网站上线冲刺：FindInsureWise内容wrap-up，6/15前全部就绪","SEO / GEO / Ads：广告账号开通，SEO基础配置，投放策略启动","Onboarding平台：Chelsea审阅后，将文档统一上传至Notion/网站","AI工具迭代：Proposal Automation · Lead Funnels · LLM知识库持续优化","内部赋能：将AI视频制作流程（ListenHub+Canva）分享给Marketing团队"],"members":[{"id":"jeff","name":"Jeff Lin","role":"Tech Lead · Seattle","initials":"JL","isLead":true,"todos":[{"id":"jf1","text":"完成FindInsureWise网站内容wrap-up，全站可上线","priority":"urgent","done":false},{"id":"jf2","text":"广告账号开通，SEO基础配置及初始关键词完成","priority":"urgent","done":false},{"id":"jf3","text":"分享ListenHub+Canva视频制作流程给Sheever/Iris","priority":"week","done":false},{"id":"jf4","text":"审阅Chelsea的Onboarding checklist，补充后上传Notion","priority":"week","done":false},{"id":"jf5","text":"确认EasyRetire / Synova AI工具当前版本状态","priority":"week","done":false},{"id":"jf6","text":"LLM知识库内容更新，AI Marketing工具功能迭代","priority":"ongoing","done":false}]},{"id":"eric","name":"Eric Zhuang","role":"Tech · Seattle","initials":"EZ","isLead":false,"todos":[{"id":"ez1","text":"网站上线前技术测试，Lead Funnel页面部署完成","priority":"urgent","done":false},{"id":"ez2","text":"广告投放追踪像素（Pixel）配置与验证","priority":"urgent","done":false},{"id":"ez3","text":"Proposal Automation功能联调与修复","priority":"week","done":false},{"id":"ez4","text":"CRM & Policy Service接口对接测试","priority":"week","done":false},{"id":"ez5","text":"Agency Management System迭代，与Jeff协作","priority":"ongoing","done":false},{"id":"ez6","text":"站点性能监控，bug修复响应","priority":"ongoing","done":false}]}]},{"id":"marketing","label":"Marketing 部门","subtitle":"P3 & P4 视频号 / 小红书 / Newsletter / 知识星球","pillar":"P3 P4 内容推广","keyTasks":["视频号双账号：开通招募向+产品向两个账号，首批视频6月中旬上线","平台调研：视频号/小红书金融类开号难度与推广预算可行性评估","推广人员招募：与Ares团队沟通，组织集体面试潜在推广人员","内容合规：建立敏感词规避机制，金融类内容合规审查流程","美区Newsletter：配合网站上线发送首期，双周常态化，跟踪转化"],"members":[{"id":"iris","name":"Iris Sui","role":"Marketing Lead · China","initials":"IS","isLead":true,"todos":[{"id":"is1","text":"小红书账号开号可行性评估，提交代理方案","priority":"urgent","done":false},{"id":"is2","text":"统筹Marketing部门6月内容日历，对齐上线节奏","priority":"urgent","done":false},{"id":"is3","text":"知识星球内容规划，首批3-5篇帖子草稿","priority":"week","done":false},{"id":"is4","text":"协助Sheever制定视频内容引流转化策略","priority":"week","done":false},{"id":"is5","text":"建立内容合规审查规范，整理敏感词替换方案","priority":"week","done":false},{"id":"is6","text":"与国内团队日常沟通，检查内容效果，定期调整策略","priority":"ongoing","done":false},{"id":"is7","text":"招聘1-2名视频内容制作助手","priority":"asneeded","done":false}]},{"id":"sheever","name":"Sheever 小泉","role":"Marketing · China","initials":"SQ","isLead":false,"todos":[{"id":"sq1","text":"调研视频号/小红书金融理财类账号开通难度及推广预算","priority":"urgent","done":false},{"id":"sq2","text":"与Iris对接，确认视频内容方向与两个账号定位","priority":"urgent","done":false},{"id":"sq3","text":"与Ares团队沟通，安排并组织推广人员集体面试","priority":"week","done":false},{"id":"sq4","text":"使用AI工具（ListenHub+Canva）制作招募类视频1条","priority":"week","done":false},{"id":"sq5","text":"制作产品类视频1条，发布试水","priority":"week","done":false},{"id":"sq6","text":"视频文案合规审查，避免敏感词，使用符号规避","priority":"ongoing","done":false}]},{"id":"yangyang","name":"YangYang","role":"Marketing · Irvine","initials":"YY","isLead":false,"todos":[{"id":"yy1","text":"配合网站上线，准备并发送首期Newsletter","priority":"urgent","done":false},{"id":"yy2","text":"NewGen Circle 微信群欢迎文案及6月活动策划","priority":"week","done":false},{"id":"yy3","text":"整理针对房产/贷款/会计师的英文招募触达内容","priority":"week","done":false},{"id":"yy4","text":"美区社交媒体内容计划（LinkedIn），与Iris对齐","priority":"week","done":false},{"id":"yy5","text":"Newsletter双周发送，跟踪open rate和转化数据","priority":"ongoing","done":false},{"id":"yy6","text":"NewGen Circle社群日常维护，活跃度管理","priority":"ongoing","done":false}]}]},{"id":"backoffice","label":"BackOffice 部门","subtitle":"P3 Agent 招募 / Onboarding / CRM / 运营支持","pillar":"P3 运营落地","keyTasks":["Onboarding全套：为每个环节制作视频+文本说明，上传Notion，形成可复制流程","Agent招募页：topnewgen.com招募信息更新，配合6/15上线","CRM对接：系统数据清理与上线测试，确保新合作伙伴可顺利进入","招募目标名单：整理房产经纪人/贷款经纪人/会计师触达名单","运营SOP：Agency Management System标准操作流程文档，客服响应规范"],"members":[{"id":"chelsea","name":"Chelsea Zhu","role":"BackOffice Lead · Bay Area","initials":"CZ","isLead":true,"todos":[{"id":"cz1","text":"为每个Onboarding环节制作视频+文本配套说明","priority":"urgent","done":false},{"id":"cz2","text":"统筹BackOffice上线前检查事项，向Joyce汇报","priority":"urgent","done":false},{"id":"cz3","text":"整理现有Onboarding checklist，分享给Jeff补充后上传","priority":"week","done":false},{"id":"cz4","text":"制作新珍网站、社群工具、培训课程使用引导视频","priority":"week","done":false},{"id":"cz5","text":"建立客户服务响应SOP，与Kongkong协作","priority":"week","done":false},{"id":"cz6","text":"维护和迭代培训课程内容，与Sheever/Joyce保持同步","priority":"ongoing","done":false}]},{"id":"nathan","name":"Nathan Li","role":"BackOffice · Bay Area","initials":"NL","isLead":false,"todos":[{"id":"nl1","text":"更新topnewgen.com Agent招募页内容，配合上线","priority":"urgent","done":false},{"id":"nl2","text":"NewGen Agency平台Agent招募流程打通","priority":"urgent","done":false},{"id":"nl3","text":"整理房产/贷款/会计师目标招募对象名单，提交Joyce","priority":"week","done":false},{"id":"nl4","text":"NewGen Circle 微信群分组管理，建立新人欢迎流程","priority":"week","done":false},{"id":"nl5","text":"与CBC Advisory Group协作，跟进CPA转介绍系统","priority":"ongoing","done":false},{"id":"nl6","text":"新合作伙伴日常支持，跟进入职后体验","priority":"ongoing","done":false}]},{"id":"kongkong","name":"Kongkong","role":"BackOffice · Bay Area","initials":"KK","isLead":false,"todos":[{"id":"kk1","text":"CRM系统数据清理与上线对接测试完成","priority":"urgent","done":false},{"id":"kk2","text":"新合作伙伴账户开通流程测试验证","priority":"urgent","done":false},{"id":"kk3","text":"整理Agency Management System标准操作SOP","priority":"week","done":false},{"id":"kk4","text":"与Chelsea协作，建立客户服务响应规范文档","priority":"week","done":false},{"id":"kk5","text":"Policy Service日常维护，处理客户咨询与问题","priority":"ongoing","done":false},{"id":"kk6","text":"后台运营数据汇报，定期向Chelsea更新","priority":"ongoing","done":false}]}]}],"lastUpdated":"2026-06-05T21:50:36.485Z","version":"1.0.1"};
 /*DEF_END*/
 
 // ── Utils ──────────────────────────────────
@@ -327,6 +269,8 @@ function rPage(){
   <div class="cover-actions">
     <button class="cover-btn" id="editBtn" data-act="editToggle">✏ 编辑</button>
     <button class="cover-btn" data-act="exportHtml">↓ 导出</button>
+    ${isLocal?`<button class="cover-btn" id="publishBtn" data-act="publishGH">☁ 发布</button>
+    <button class="cover-btn" data-act="openHistory">🕐 历史</button>`:''}
     <button class="cover-btn" data-act="reset">↺ 重置数据</button>
   </div>
   <div class="cover-label">NewGen Growth Ecosystem · 内部工作文件</div>
@@ -393,6 +337,14 @@ document.addEventListener('click',function(e){
 
   // Export HTML
   if(act==='exportHtml'){exportHtml();return;}
+
+  // Publish to GitHub (Shift+click to reset stored token)
+  if(act==='publishGH'){publishToGitHub();return;}
+
+  // Version history
+  if(act==='openHistory'){openHistory();return;}
+  if(act==='closeHistory'){closeHistory();return;}
+  if(act==='rollback'){rollbackTo(el.dataset.path,el.dataset.ver,el);return;}
 
   // Reset
   if(act==='reset'){
@@ -534,12 +486,13 @@ function setEditMode(on){
   if(!on){save();showToast();}
 }
 
-function showToast(){
+function showToast(msg){
   const t=document.getElementById('save-toast');
   if(!t)return;
+  t.textContent=msg||'已保存 ✓';
   t.classList.add('show');
   clearTimeout(t._timer);
-  t._timer=setTimeout(()=>t.classList.remove('show'),1800);
+  t._timer=setTimeout(()=>{t.classList.remove('show');t.textContent='已保存 ✓';},1800);
 }
 
 function bumpVersion(v){
@@ -556,6 +509,16 @@ function downloadBlob(blob,filename){
   URL.revokeObjectURL(a.href);
 }
 
+function buildExportHtml(){
+  const appEl=document.getElementById('app');
+  const savedContent=appEl.innerHTML;
+  appEl.innerHTML='';
+  let html=document.documentElement.outerHTML;
+  appEl.innerHTML=savedContent;
+  return html.replace(/\/\*DEF_START\*\/[\s\S]*?\/\*DEF_END\*\//,
+    `/*DEF_START*/\nconst DEF = ${JSON.stringify(data)};\n/*DEF_END*/`);
+}
+
 function exportHtml(){
   data.version=bumpVersion(data.version);
   save();
@@ -563,19 +526,7 @@ function exportHtml(){
   const pad=n=>String(n).padStart(2,'0');
   const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
   const filename=`NewGen_Team_Interactive_v${data.version}_${stamp}.html`;
-
-  // Temporarily clear #app so the serialized HTML has a clean empty container
-  const appEl=document.getElementById('app');
-  const savedContent=appEl.innerHTML;
-  appEl.innerHTML='';
-  let html=document.documentElement.outerHTML;
-  appEl.innerHTML=savedContent;
-
-  // Bake current data into DEF
-  html=html.replace(/\/\*DEF_START\*\/[\s\S]*?\/\*DEF_END\*\//,
-    `/*DEF_START*/\nconst DEF = ${JSON.stringify(data)};\n/*DEF_END*/`);
-
-  const blob=new Blob([html],{type:'text/html'});
+  const blob=new Blob([buildExportHtml()],{type:'text/html'});
   if(window.showSaveFilePicker){
     window.showSaveFilePicker({
       suggestedName:filename,
@@ -587,7 +538,158 @@ function exportHtml(){
   }
 }
 
+function toBase64Utf8(str){
+  const bytes=new TextEncoder().encode(str);
+  let bin='';
+  for(let i=0;i<bytes.length;i+=8192) bin+=String.fromCharCode(...bytes.subarray(i,i+8192));
+  return btoa(bin);
+}
+
+const REPO='LucaLinkAI/newgen-taskboard';
+
+function ghHeaders(){
+  const token=localStorage.getItem('ng-gh-token');
+  return token?{'Authorization':'Bearer '+token,'Content-Type':'application/json'}:null;
+}
+
+async function ghGet(path){
+  const h=ghHeaders();if(!h)throw new Error('No token');
+  const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{headers:h});
+  if(!r.ok)throw new Error('GitHub '+r.status+' '+r.statusText);
+  return r.json();
+}
+
+async function ghPut(path,content64,sha,message){
+  const h=ghHeaders();if(!h)throw new Error('No token');
+  const body={message,content:content64};
+  if(sha)body.sha=sha;
+  const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{method:'PUT',headers:h,body:JSON.stringify(body)});
+  if(!r.ok){const e=await r.json();throw new Error(e.message||r.status);}
+  return r.json();
+}
+
+async function publishToGitHub(){
+  const btn=document.getElementById('publishBtn');
+
+  const token=localStorage.getItem('ng-gh-token');
+  if(!token){alert('GitHub token not found.\nAdd it to config.local.js and reload.');return;}
+
+  data.version=bumpVersion(data.version);
+  save();
+  const html=buildExportHtml();
+  const content64=toBase64Utf8(html);
+
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+  if(btn){btn.textContent='⏳ 发布中...';btn.style.opacity='.6';}
+  try{
+    // Update index.html
+    const {sha}=await ghGet('index.html');
+    await ghPut('index.html',content64,sha,`publish v${data.version}`);
+
+    // Archive to versions/
+    await ghPut(`versions/v${data.version}_${stamp}.html`,content64,null,`archive v${data.version}`);
+
+    if(btn){btn.textContent='✓ 已发布';btn.style.opacity='';setTimeout(()=>{btn.textContent='☁ 发布';},3000);}
+    showToast('已推送 GitHub ✓');
+  }catch(err){
+    console.error(err);
+    if(btn){btn.textContent='✗ 失败';btn.style.opacity='';setTimeout(()=>{btn.textContent='☁ 发布';},3000);}
+    alert('发布失败: '+err.message);
+  }
+}
+
+// ── Version history ──────────────────────────
+function formatStamp(s){
+  // s = '20260605-143022'
+  const y=s.slice(0,4),mo=parseInt(s.slice(4,6)),d=parseInt(s.slice(6,8));
+  const h=s.slice(9,11),mi=s.slice(11,13);
+  return `${y}年${mo}月${d}日 ${h}:${mi}`;
+}
+
+function openHistory(){
+  document.getElementById('history-panel').classList.add('open');
+  document.getElementById('history-backdrop').classList.add('open');
+  loadHistory();
+}
+
+function closeHistory(){
+  document.getElementById('history-panel').classList.remove('open');
+  document.getElementById('history-backdrop').classList.remove('open');
+}
+
+async function loadHistory(){
+  const list=document.querySelector('#history-panel .hp-list');
+  list.innerHTML='<p class="hp-msg">加载中...</p>';
+
+  if(!localStorage.getItem('ng-gh-token')){
+    list.innerHTML='<p class="hp-msg">请先配置 GitHub Token<br>（点击 ☁ 发布 输入）</p>';
+    return;
+  }
+
+  try{
+    let files;
+    try{files=await ghGet('versions');}
+    catch(e){
+      if(e.message.includes('404')){list.innerHTML='<p class="hp-msg">暂无历史版本<br>发布后自动归档</p>';return;}
+      throw e;
+    }
+
+    if(!Array.isArray(files)||files.length===0){
+      list.innerHTML='<p class="hp-msg">暂无历史版本</p>';return;
+    }
+
+    const current=data.version||'1.0.0';
+    files.sort((a,b)=>b.name.localeCompare(a.name));
+
+    list.innerHTML=files.map(f=>{
+      const m=f.name.match(/v(\d+\.\d+\.\d+)_(\d{8}-\d{6})/);
+      const ver=m?m[1]:f.name.replace('.html','');
+      const ts=m?formatStamp(m[2]):'';
+      const isCurrent=ver===current;
+      return `<div class="hp-item${isCurrent?' current':''}">
+  <div class="hp-info">
+    <span class="hp-ver">v${ver}</span>
+    ${ts?`<span class="hp-ts">${ts}</span>`:''}
+    ${isCurrent?'<span class="hp-badge">当前版本</span>':''}
+  </div>
+  <button class="hp-rollback-btn" data-act="rollback" data-path="${f.path}" data-ver="${ver}"${isCurrent?' disabled':''}>
+    ${isCurrent?'当前':'回滚'}
+  </button>
+</div>`;
+    }).join('');
+  }catch(err){
+    list.innerHTML=`<p class="hp-msg">加载失败<br>${err.message}</p>`;
+  }
+}
+
+async function rollbackTo(path,ver,btn){
+  if(!confirm(`确定回滚到 v${ver}？\n\n这将覆盖当前线上版本并触发重新部署。`))return;
+
+  btn.textContent='回滚中...';btn.disabled=true;
+  try{
+    // Fetch old version (content is base64 from GitHub API)
+    const vData=await ghGet(path);
+    const content64=vData.content.replace(/\n/g,'');
+
+    // Get current index.html SHA
+    const {sha}=await ghGet('index.html');
+
+    await ghPut('index.html',content64,sha,`rollback to v${ver}`);
+
+    btn.textContent='✓ 已回滚';
+    showToast(`已回滚到 v${ver} ✓`);
+    // Refresh list to reflect new current (decode version from content)
+    setTimeout(loadHistory,800);
+  }catch(err){
+    btn.textContent='回滚';btn.disabled=false;
+    alert('回滚失败: '+err.message);
+  }
+}
+
 rPage();
 </script>
-</body>
-</html>
+
+</body></html>
