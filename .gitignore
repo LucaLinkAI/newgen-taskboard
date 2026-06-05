@@ -1,0 +1,2 @@
+# Keep versioned snapshots out of the main tree — move them to versions/ if you want to archive them
+NewGen_Team_Interactive_v*.html
