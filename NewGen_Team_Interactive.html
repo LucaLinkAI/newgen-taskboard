@@ -160,6 +160,7 @@ const PRI = {
   asneeded: {l:'视需要', bg:'#F0EBF8', c:'#5B2D90'}
 };
 const PO = ['urgent','week','ongoing','asneeded'];
+const isLocal = location.protocol==='file:' || location.hostname==='localhost' || location.hostname==='127.0.0.1';
 
 const META = {
   overall:    {color:'#1B2B4B', light:'#EEF2FA', border:'#C5CFEA', icon:'J'},
@@ -358,8 +359,8 @@ function rPage(){
   <div class="cover-actions">
     <button class="cover-btn" id="editBtn" data-act="editToggle">✏ 编辑</button>
     <button class="cover-btn" data-act="exportHtml">↓ 导出</button>
-    <button class="cover-btn" id="publishBtn" data-act="publishGH">☁ 发布</button>
-    <button class="cover-btn" data-act="openHistory">🕐 历史</button>
+    ${isLocal?`<button class="cover-btn" id="publishBtn" data-act="publishGH">☁ 发布</button>
+    <button class="cover-btn" data-act="openHistory">🕐 历史</button>`:''}
     <button class="cover-btn" data-act="reset">↺ 重置数据</button>
   </div>
   <div class="cover-label">NewGen Growth Ecosystem · 内部工作文件</div>
