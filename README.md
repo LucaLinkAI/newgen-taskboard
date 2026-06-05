@@ -16,34 +16,71 @@ Interactive team task board for the NewGen Growth Ecosystem. Tracks department k
 | Export versioned snapshot | Click **↓ 导出** |
 | Reset to defaults | Click **↺ 重置数据** |
 
-## Publishing an update
+> **☁ 发布** and **🕐 历史** are only visible when running locally — they are hidden on the live GitHub Pages site.
 
-Edit locally, export a snapshot, then publish in one command:
+## Publish workflow
 
-```bash
-./publish.sh "NewGen_Team_Interactive_v1.0.2_20260605-150000.html"
+```
+Your browser (local)
+  │
+  ├─ 1. Bumps version: data.version 1.0.0 → 1.0.1
+  ├─ 2. Saves to localStorage
+  ├─ 3. Bakes current data into DEF → builds full HTML string
+  │
+  ├─ 4. GitHub API: GET index.html → gets current SHA
+  ├─ 5. GitHub API: PUT index.html (new content) → updates live page
+  └─ 6. GitHub API: PUT versions/v1.0.1_20260605-150000.html → archives snapshot
+           │
+           └─ push triggers GitHub Actions → Pages redeploys in ~60s
 ```
 
-This copies the exported file to `index.html`, commits, and pushes. GitHub Pages redeploys in ~60 seconds.
+## Version history (🕐 历史)
 
-To publish the working file directly without exporting:
-
-```bash
-./publish.sh
+```
+Click 🕐 历史
+  │
+  └─ GitHub API: GET versions/ folder
+       → lists all archived files
+       → sorted newest first
+       → current version marked 当前版本 (rollback disabled)
 ```
 
-## How versioning works
+## Rollback
 
-- The current version is stored inside the data object (`data.version`) and displayed in the header
-- **↓ 导出** increments the patch number (`1.0.0 → 1.0.1`) and bakes the current state into `DEF` in the exported file
-- Opening an exported file starts with that exact saved state — no localStorage dependency
-- Each visitor on the live site gets their own isolated localStorage; the shared source of truth is whatever is in `index.html` on `main`
+```
+Click 回滚 on v1.0.0
+  │
+  ├─ 1. GitHub API: GET versions/v1.0.0_TIMESTAMP.html
+  │       → fetches that file's content (already base64)
+  │
+  ├─ 2. GitHub API: GET index.html → gets current SHA
+  │
+  └─ 3. GitHub API: PUT index.html (old content, same SHA)
+           → commit message: "rollback to v1.0.0"
+           └─ triggers GitHub Actions → Pages redeploys with old version
+```
+
+> Rollback does **not** create a new entry in `versions/` — it just overwrites `index.html`. If you publish again after a rollback, the version counter picks up from where it left off.
+
+## GitHub token setup (one-time)
+
+1. Create a fine-grained PAT at https://github.com/settings/personal-access-tokens/new
+   - Repository access: `LucaLinkAI/newgen-taskboard`
+   - Permissions: **Contents — Read and write**
+2. Paste it into `config.local.js`:
+   ```js
+   localStorage.setItem('ng-gh-token', 'github_pat_...');
+   ```
+3. Reload `NewGen_Team_Interactive.html` — token is silently loaded, no further prompts.
+
+`config.local.js` is gitignored and never committed or visible on GitHub Pages.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
 | `NewGen_Team_Interactive.html` | Working copy — edit this locally |
-| `index.html` | Published copy served by GitHub Pages (updated by `publish.sh`) |
-| `publish.sh` | One-command publish script |
+| `config.local.js` | Gitignored local config — stores GitHub PAT |
+| `publish.sh` | CLI publish script (alternative to the button) |
 | `.github/workflows/deploy.yml` | Auto-deploy to Pages on every push to `main` |
+| `versions/` | Archived HTML snapshots (managed automatically by publish button) |
