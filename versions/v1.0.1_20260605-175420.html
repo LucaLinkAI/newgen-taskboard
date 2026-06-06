@@ -1,0 +1,745 @@
+<html lang="zh"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewGen 团队分工规划 · 可编辑版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&amp;family=DM+Sans:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<style>
+:root {
+  --page-bg:#F5F6FA; --border:#E0E4EE; --text:#1A1E2E; --muted:#6B7280;
+  --urgent-bg:#FDECEA; --urgent:#C0392B;
+  --week-bg:#FEF4E4;   --week:#7D4D00;
+  --ongoing-bg:#ECF7EC; --ongoing:#245E2A;
+  --asneeded-bg:#F0EBF8; --asneeded:#5B2D90;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+body{font-family:'DM Sans',sans-serif;background:var(--page-bg);color:var(--text);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+/* Cover */
+.cover{background:#1B2B4B;color:#fff;padding:48px 64px 40px;position:relative;overflow:hidden;}
+.cover::after{content:'';position:absolute;right:-40px;top:-40px;width:300px;height:300px;border:1px solid rgba(255,255,255,0.07);border-radius:50%;pointer-events:none;}
+.cover-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:14px;}
+.cover h1{font-family:'Playfair Display',serif;font-size:36px;font-weight:600;line-height:1.2;margin-bottom:10px;}
+.cover-sub{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:28px;}
+.cover-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.cover-pill{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:4px;padding:4px 10px;font-size:11px;color:rgba(255,255,255,.75);}
+.cover-meta{font-size:11px;color:rgba(255,255,255,.35);margin-top:16px;letter-spacing:.03em;}
+.cover-actions{position:absolute;top:20px;right:24px;display:flex;gap:8px;}
+.cover-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.85);border-radius:5px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s;}
+.cover-btn:hover{background:rgba(255,255,255,.2);}
+
+/* Leads row */
+.leads-row{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-bottom:1px solid var(--border);}
+.lead-card{padding:18px 20px;border-right:1px solid var(--border);position:relative;}
+.lead-card:last-child{border-right:none;}
+.lead-accent{position:absolute;top:0;left:0;width:3px;height:100%;}
+.lead-role{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.lead-name{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:2px;}
+.lead-dept{font-size:11px;color:var(--muted);}
+.lead-badge{display:inline-block;margin-top:7px;font-size:10px;padding:2px 8px;border-radius:3px;font-weight:500;}
+
+/* Sections */
+.sections{padding:0 24px;}
+.section{margin-top:24px;}
+.section:last-child{margin-bottom:24px;}
+.dept-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-radius:8px 8px 0 0;border:1px solid transparent;border-bottom:none;}
+.dept-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:#fff;font-family:'Playfair Display',serif;flex-shrink:0;}
+.dept-header-text h2{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;}
+.dept-header-text p{font-size:11px;opacity:.65;margin-top:1px;}
+.dept-body{background:#fff;border:1px solid var(--border);border-radius:0 0 8px 8px;overflow:hidden;}
+
+/* Key tasks */
+.key-tasks{padding:18px 20px;border-bottom:1px solid var(--border);}
+.section-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:10px;}
+.key-tasks-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;}
+.key-task-item{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:6px;border:1px solid var(--border);background:var(--page-bg);position:relative;}
+.key-task-item:hover .item-del{opacity:1!important;}
+.key-task-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#fff;flex-shrink:0;margin-top:1px;}
+.keytask-text{font-size:12px;line-height:1.5;flex:1;cursor:text;outline:none;}
+.keytask-text:focus{background:rgba(0,0,0,.04);border-radius:3px;padding:1px 3px;margin:-1px -3px;outline:1px solid rgba(0,0,0,.12);}
+.item-del{opacity:0!important;background:none;border:none;cursor:pointer;color:#bbb;font-size:17px;line-height:1;padding:0 2px;flex-shrink:0;transition:color .15s;}
+.item-del:hover{color:var(--urgent)!important;}
+.add-task-row{margin-top:8px;}
+.add-btn{background:none;border:1px dashed var(--border);border-radius:5px;color:var(--muted);cursor:pointer;font-size:12px;padding:5px 12px;font-family:inherit;transition:all .15s;width:100%;}
+.add-btn:hover{border-color:#aaa;color:var(--text);background:rgba(0,0,0,.02);}
+
+/* Team grid */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+.member-card{padding:18px 20px;border-right:1px solid var(--border);border-top:1px solid var(--border);}
+.member-card:last-child{border-right:none;}
+.member-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.member-name{font-weight:500;font-size:13px;}
+.member-role{font-size:11px;color:var(--muted);}
+.lead-tag{margin-left:auto;font-size:9px;padding:2px 7px;border-radius:3px;font-weight:500;white-space:nowrap;}
+
+/* Todo items */
+.todo-list{display:flex;flex-direction:column;min-height:20px;}
+.todo-item{display:flex;align-items:flex-start;gap:7px;padding:6px 4px;border-radius:5px;position:relative;transition:background .1s;}
+.todo-item:hover{background:rgba(0,0,0,.025);}
+.todo-item:hover .drag-handle,.todo-item:hover .todo-del{opacity:1;}
+.drag-handle{opacity:0;cursor:grab;color:#c0c5d0;font-size:15px;margin-top:2px;flex-shrink:0;transition:opacity .15s;user-select:none;padding:0 1px;}
+.drag-handle:active{cursor:grabbing;}
+.todo-check{width:14px;height:14px;border:1.5px solid #ccc;border-radius:3px;flex-shrink:0;margin-top:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.todo-check.ck{background:#52b060;border-color:#52b060;}
+.todo-check.ck::after{content:'✓';color:#fff;font-size:9px;}
+.pbadge{flex-shrink:0;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:500;white-space:nowrap;cursor:pointer;margin-top:2px;transition:transform .1s;user-select:none;}
+.pbadge:hover{transform:scale(1.06);}
+.pbadge:active{transform:scale(.95);}
+.todo-text{flex:1;font-size:12px;line-height:1.5;cursor:text;word-break:break-word;outline:none;}
+.todo-text:focus{background:rgba(0,0,0,.04);border-radius:3px;padding:1px 3px;margin:-1px -3px;outline:1px solid rgba(0,0,0,.12);}
+.todo-item.done .todo-text{text-decoration:line-through;color:var(--muted);}
+.todo-del{opacity:0;background:none;border:none;cursor:pointer;color:#bbb;font-size:17px;line-height:1;padding:0 2px;flex-shrink:0;margin-top:1px;transition:opacity .15s,color .15s;}
+.todo-del:hover{color:var(--urgent);}
+.sortable-ghost{opacity:.3;background:#e4e8f5!important;border-radius:5px;}
+.sortable-drag{opacity:.95!important;box-shadow:0 4px 16px rgba(0,0,0,.15)!important;border-radius:5px;}
+
+/* Legend */
+.legend{display:flex;align-items:center;gap:16px;padding:14px 24px;background:#fff;border-top:1px solid var(--border);flex-wrap:wrap;margin-top:24px;}
+.legend-title{font-size:11px;color:var(--muted);font-weight:500;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;}
+.legend-hint{margin-left:auto;font-size:11px;color:var(--muted);font-style:italic;}
+
+/* Edit mode */
+body:not(.edit-mode) .todo-del,
+body:not(.edit-mode) .item-del,
+body:not(.edit-mode) .drag-handle,
+body:not(.edit-mode) .add-task-row{display:none;}
+body:not(.edit-mode) .todo-text,
+body:not(.edit-mode) .keytask-text{pointer-events:none;user-select:none;cursor:default;}
+body.edit-mode .cover-btn#editBtn{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.5);}
+
+/* Save toast */
+#save-toast{position:fixed;bottom:24px;right:24px;background:#1B2B4B;color:#fff;padding:8px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;z-index:3000;}
+#save-toast.show{opacity:1;}
+
+/* History panel */
+#history-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:2000;opacity:0;pointer-events:none;transition:opacity .25s;}
+#history-backdrop.open{opacity:1;pointer-events:auto;}
+#history-panel{position:fixed;top:0;right:0;height:100%;width:320px;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.14);z-index:2001;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;font-family:'DM Sans',sans-serif;}
+#history-panel.open{transform:translateX(0);}
+.hp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.hp-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--text);}
+.hp-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:0 2px;}
+.hp-close:hover{color:var(--text);}
+.hp-list{flex:1;overflow-y:auto;padding:8px 0;}
+.hp-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);}
+.hp-item:last-child{border-bottom:none;}
+.hp-item.current{background:#EEF2FA;}
+.hp-info{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.hp-ver{font-size:13px;font-weight:600;color:var(--text);}
+.hp-ts{font-size:11px;color:var(--muted);}
+.hp-badge{font-size:9px;padding:1px 6px;border-radius:3px;background:#1B2B4B;color:#fff;font-weight:500;display:inline-block;margin-top:1px;}
+.hp-rollback-btn{background:#1B2B4B;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.hp-rollback-btn:hover{background:#2d4270;}
+.hp-rollback-btn:disabled{opacity:.5;cursor:default;}
+.hp-msg{padding:32px 20px;font-size:13px;color:var(--muted);text-align:center;line-height:1.6;}
+</style>
+</head>
+<body>
+<script src="config.local.js" onerror="void 0"></script>
+<div id="app"></div>
+<div id="save-toast">已保存 ✓</div>
+<div id="history-backdrop" data-act="closeHistory"></div>
+<div id="history-panel">
+  <div class="hp-header">
+    <span class="hp-title">版本历史</span>
+    <button class="hp-close" data-act="closeHistory">×</button>
+  </div>
+  <div class="hp-list"><p class="hp-msg">加载中...</p></div>
+</div>
+<script>
+const PRI = {
+  urgent:   {l:'6/15前', bg:'#FDECEA', c:'#C0392B'},
+  week:     {l:'本周',   bg:'#FEF4E4', c:'#7D4D00'},
+  ongoing:  {l:'持续',   bg:'#ECF7EC', c:'#245E2A'},
+  asneeded: {l:'视需要', bg:'#F0EBF8', c:'#5B2D90'}
+};
+const PO = ['urgent','week','ongoing','asneeded'];
+const isLocal = location.protocol==='file:' || location.hostname==='localhost' || location.hostname==='127.0.0.1';
+
+const META = {
+  overall:    {color:'#1B2B4B', light:'#EEF2FA', border:'#C5CFEA', icon:'J'},
+  tech:       {color:'#1A4A8A', light:'#EAF1FB', border:'#C0D8F5', icon:'T'},
+  marketing:  {color:'#1A5438', light:'#E6F4EE', border:'#B5DCCA', icon:'M'},
+  backoffice: {color:'#8C3A20', light:'#FBF0EB', border:'#EDCABB', icon:'B'}
+};
+
+/*DEF_START*/
+const DEF = {"departments":[{"id":"overall","label":"总负责人","subtitle":"整体战略统筹 · CBC Advisory Group · 四大支柱对齐","pillar":"P1 P2 P3 P4 全部","keyTasks":["确认各部门6月推广计划，统一对齐6/15上线节奏","CBC Advisory Group 专业转介绍网络启动，制定CPA合作条款","梳理招募目标人群画像：房产经纪人、贷款经纪人、会计师","主持每周例会，驱动跨部门协作，更新agenda与优先级","CBC专家微信群、知识星球内容方向与品质监督"],"members":[{"id":"joyce","name":"Joyce Liang","role":"CEO · Bay Area","initials":"JL","isLead":true,"todos":[{"id":"j1","text":"审阅各部门上线前检查清单，给出最终确认","priority":"urgent","done":false},{"id":"j2","text":"制定CBC CPA转介绍合作条款草案","priority":"urgent","done":false},{"id":"j3","text":"整理招募目标人群画像，分发给Jeff/Nathan","priority":"week","done":true},{"id":"j4","text":"确定\"科技赋能保险招募\"差异化定位的最终表述","priority":"week","done":true},{"id":"j5","text":"主持每周例会，更新跨部门任务进度","priority":"ongoing","done":false},{"id":"j6","text":"CBC专家微信群维护，线下讲座与专题讲座规划","priority":"ongoing","done":false}]}]},{"id":"tech","label":"Tech 部门","subtitle":"P1 Synova InsureTech · P2 FindInsureWise / EasyRetire","pillar":"P1 P2 主导","keyTasks":["网站上线冲刺：FindInsureWise内容wrap-up，6/15前全部就绪","SEO / GEO / Ads：广告账号开通，SEO基础配置，投放策略启动","Onboarding平台：Chelsea审阅后，将文档统一上传至Notion/网站","AI工具迭代：Proposal Automation · Lead Funnels · LLM知识库持续优化","内部赋能：将AI视频制作流程（ListenHub+Canva）分享给Marketing团队"],"members":[{"id":"jeff","name":"Jeff Lin","role":"Tech Lead · Seattle","initials":"JL","isLead":true,"todos":[{"id":"jf1","text":"完成FindInsureWise网站内容wrap-up，全站可上线","priority":"urgent","done":false},{"id":"jf2","text":"广告账号开通，SEO基础配置及初始关键词完成","priority":"urgent","done":false},{"id":"jf3","text":"分享ListenHub+Canva视频制作流程给Sheever/Iris","priority":"week","done":false},{"id":"jf4","text":"审阅Chelsea的Onboarding checklist，补充后上传Notion","priority":"week","done":false},{"id":"jf5","text":"确认EasyRetire / Synova AI工具当前版本状态","priority":"week","done":false},{"id":"jf6","text":"LLM知识库内容更新，AI Marketing工具功能迭代","priority":"ongoing","done":false}]},{"id":"eric","name":"Eric Zhuang","role":"Tech · Seattle","initials":"EZ","isLead":false,"todos":[{"id":"ez1","text":"网站上线前技术测试，Lead Funnel页面部署完成","priority":"urgent","done":false},{"id":"ez2","text":"广告投放追踪像素（Pixel）配置与验证","priority":"urgent","done":false},{"id":"ez3","text":"Proposal Automation功能联调与修复","priority":"week","done":false},{"id":"ez4","text":"CRM & Policy Service接口对接测试","priority":"week","done":false},{"id":"ez5","text":"Agency Management System迭代，与Jeff协作","priority":"ongoing","done":false},{"id":"ez6","text":"站点性能监控，bug修复响应","priority":"ongoing","done":false}]}]},{"id":"marketing","label":"Marketing 部门","subtitle":"P3 & P4 视频号 / 小红书 / Newsletter / 知识星球","pillar":"P3 P4 内容推广","keyTasks":["视频号双账号：开通招募向+产品向两个账号，首批视频6月中旬上线","平台调研：视频号/小红书金融类开号难度与推广预算可行性评估","推广人员招募：与Ares团队沟通，组织集体面试潜在推广人员","内容合规：建立敏感词规避机制，金融类内容合规审查流程","美区Newsletter：配合网站上线发送首期，双周常态化，跟踪转化"],"members":[{"id":"iris","name":"Iris Sui","role":"Marketing Lead · China","initials":"IS","isLead":true,"todos":[{"id":"is1","text":"小红书账号开号可行性评估，提交代理方案","priority":"urgent","done":false},{"id":"is2","text":"统筹Marketing部门6月内容日历，对齐上线节奏","priority":"urgent","done":false},{"id":"is3","text":"知识星球内容规划，首批3-5篇帖子草稿","priority":"week","done":false},{"id":"is4","text":"协助Sheever制定视频内容引流转化策略","priority":"week","done":false},{"id":"is5","text":"建立内容合规审查规范，整理敏感词替换方案","priority":"week","done":false},{"id":"is6","text":"与国内团队日常沟通，检查内容效果，定期调整策略","priority":"ongoing","done":false},{"id":"is7","text":"招聘1-2名视频内容制作助手","priority":"asneeded","done":false}]},{"id":"sheever","name":"Sheever 小泉","role":"Marketing · China","initials":"SQ","isLead":false,"todos":[{"id":"sq1","text":"调研视频号/小红书金融理财类账号开通难度及推广预算","priority":"urgent","done":false},{"id":"sq2","text":"与Iris对接，确认视频内容方向与两个账号定位","priority":"urgent","done":false},{"id":"sq3","text":"与Ares团队沟通，安排并组织推广人员集体面试","priority":"week","done":false},{"id":"sq4","text":"使用AI工具（ListenHub+Canva）制作招募类视频1条","priority":"week","done":false},{"id":"sq5","text":"制作产品类视频1条，发布试水","priority":"week","done":false},{"id":"sq6","text":"视频文案合规审查，避免敏感词，使用符号规避","priority":"ongoing","done":false}]},{"id":"yangyang","name":"YangYang","role":"Marketing · Irvine","initials":"YY","isLead":false,"todos":[{"id":"yy1","text":"配合网站上线，准备并发送首期Newsletter","priority":"urgent","done":false},{"id":"yy2","text":"NewGen Circle 微信群欢迎文案及6月活动策划","priority":"week","done":false},{"id":"yy3","text":"整理针对房产/贷款/会计师的英文招募触达内容","priority":"week","done":false},{"id":"yy4","text":"美区社交媒体内容计划（LinkedIn），与Iris对齐","priority":"week","done":false},{"id":"yy5","text":"Newsletter双周发送，跟踪open rate和转化数据","priority":"ongoing","done":false},{"id":"yy6","text":"NewGen Circle社群日常维护，活跃度管理","priority":"ongoing","done":false}]}]},{"id":"backoffice","label":"BackOffice 部门","subtitle":"P3 Agent 招募 / Onboarding / CRM / 运营支持","pillar":"P3 运营落地","keyTasks":["Onboarding全套：为每个环节制作视频+文本说明，上传Notion，形成可复制流程","Agent招募页：topnewgen.com招募信息更新，配合6/15上线","CRM对接：系统数据清理与上线测试，确保新合作伙伴可顺利进入","招募目标名单：整理房产经纪人/贷款经纪人/会计师触达名单","运营SOP：Agency Management System标准操作流程文档，客服响应规范"],"members":[{"id":"chelsea","name":"Chelsea Zhu","role":"BackOffice Lead · Bay Area","initials":"CZ","isLead":true,"todos":[{"id":"cz1","text":"为每个Onboarding环节制作视频+文本配套说明","priority":"urgent","done":false},{"id":"cz2","text":"统筹BackOffice上线前检查事项，向Joyce汇报","priority":"urgent","done":false},{"id":"cz3","text":"整理现有Onboarding checklist，分享给Jeff补充后上传","priority":"week","done":false},{"id":"cz4","text":"制作新珍网站、社群工具、培训课程使用引导视频","priority":"week","done":false},{"id":"cz5","text":"建立客户服务响应SOP，与Kongkong协作","priority":"week","done":false},{"id":"cz6","text":"维护和迭代培训课程内容，与Sheever/Joyce保持同步","priority":"ongoing","done":false}]},{"id":"nathan","name":"Nathan Li","role":"BackOffice · Bay Area","initials":"NL","isLead":false,"todos":[{"id":"nl1","text":"更新topnewgen.com Agent招募页内容，配合上线","priority":"urgent","done":false},{"id":"nl2","text":"NewGen Agency平台Agent招募流程打通","priority":"urgent","done":false},{"id":"nl3","text":"整理房产/贷款/会计师目标招募对象名单，提交Joyce","priority":"week","done":false},{"id":"nl4","text":"NewGen Circle 微信群分组管理，建立新人欢迎流程","priority":"week","done":false},{"id":"nl5","text":"与CBC Advisory Group协作，跟进CPA转介绍系统","priority":"ongoing","done":false},{"id":"nl6","text":"新合作伙伴日常支持，跟进入职后体验","priority":"ongoing","done":false}]},{"id":"kongkong","name":"Kongkong","role":"BackOffice · Bay Area","initials":"KK","isLead":false,"todos":[{"id":"kk1","text":"CRM系统数据清理与上线对接测试完成","priority":"urgent","done":false},{"id":"kk2","text":"新合作伙伴账户开通流程测试验证","priority":"urgent","done":false},{"id":"kk3","text":"整理Agency Management System标准操作SOP","priority":"week","done":false},{"id":"kk4","text":"与Chelsea协作，建立客户服务响应规范文档","priority":"week","done":false},{"id":"kk5","text":"Policy Service日常维护，处理客户咨询与问题","priority":"ongoing","done":false},{"id":"kk6","text":"后台运营数据汇报，定期向Chelsea更新","priority":"ongoing","done":false}]}]}],"lastUpdated":"2026-06-06T00:54:20.364Z","version":"1.0.1"};
+/*DEF_END*/
+
+// ── Utils ──────────────────────────────────
+function uid(){return 't'+Date.now()+Math.random().toString(36).substr(2,5);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function loadData(){try{const s=localStorage.getItem('ng-plan');return s?JSON.parse(s):JSON.parse(JSON.stringify(DEF));}catch(e){return JSON.parse(JSON.stringify(DEF));}}
+function save(){
+  try{
+    data.lastUpdated=new Date().toISOString();
+    localStorage.setItem('ng-plan',JSON.stringify(data));
+    const m=document.querySelector('.cover-meta');
+    if(m) m.textContent=`v${data.version||'1.0.0'} · 最后更新 ${fmtDate(data.lastUpdated)}`;
+  }catch(e){}
+}
+function fmtDate(iso){if(!iso)return '—';const d=new Date(iso);const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`;}
+function findMember(id){for(const d of data.departments){const m=d.members.find(m=>m.id===id);if(m)return m;}}
+function findDept(id){return data.departments.find(d=>d.id===id);}
+
+let data = loadData();
+let _sortables = {};
+
+// ── Render helpers ──────────────────────────
+function pbadge(p){const v=PRI[p]||PRI.ongoing;return `<span class="pbadge" style="background:${v.bg};color:${v.c};" data-act="cyc">${v.l}</span>`;}
+
+function rTodo(t,mid){
+  return `<div class="todo-item${t.done?' done':''}" data-tid="${t.id}" data-mid="${mid}">
+  <span class="drag-handle" title="拖拽换人">⠿</span>
+  <div class="todo-check${t.done?' ck':''}" data-act="chk"></div>
+  ${pbadge(t.priority)}
+  <div class="todo-text" data-act="etxt" spellcheck="false">${esc(t.text)}</div>
+  <button class="todo-del" data-act="del" title="删除">×</button>
+</div>`;}
+
+function rMember(m,meta){
+  const leadTag=m.isLead?`<span class="lead-tag" style="background:${meta.color};color:#fff;">负责人</span>`:'';
+  return `<div class="member-card">
+  <div class="member-head">
+    <div class="avatar" style="background:${meta.light};color:${meta.color};">${m.initials}</div>
+    <div><div class="member-name">${esc(m.name)}</div><div class="member-role">${esc(m.role)}</div></div>
+    ${leadTag}
+  </div>
+  <div class="section-label">TODO List</div>
+  <div class="todo-list" data-mid="${m.id}">
+    ${m.todos.map(t=>rTodo(t,m.id)).join('')}
+  </div>
+  <div class="add-task-row">
+    <button class="add-btn" data-act="addtodo" data-mid="${m.id}">+ 添加任务</button>
+  </div>
+</div>`;}
+
+function rKeyTask(t,deptId,i,meta){
+  return `<div class="key-task-item" data-ki="${i}" data-did="${deptId}">
+  <div class="key-task-num" style="background:${meta.color};">${i+1}</div>
+  <div class="keytask-text" data-act="ekt" spellcheck="false">${esc(t)}</div>
+  <button class="item-del" data-act="delkt" title="删除">×</button>
+</div>`;}
+
+function rDept(d){
+  const meta=META[d.id];
+  const leadName=d.members.find(m=>m.isLead)?.name||'';
+  return `<div class="section" data-did="${d.id}">
+  <div class="dept-header" style="background:${meta.light};border-color:${meta.border};color:${meta.color};">
+    <div class="dept-icon" style="background:${meta.color};">${meta.icon}</div>
+    <div class="dept-header-text"><h2>${esc(d.label)} · ${esc(leadName)} 负责</h2><p>${esc(d.subtitle)}</p></div>
+  </div>
+  <div class="dept-body">
+    <div class="key-tasks">
+      <div class="section-label">部门重点任务</div>
+      <div class="key-tasks-list" data-did="${d.id}">
+        ${d.keyTasks.map((t,i)=>rKeyTask(t,d.id,i,meta)).join('')}
+      </div>
+      <div class="add-task-row"><button class="add-btn" data-act="addkt" data-did="${d.id}">+ 添加重点任务</button></div>
+    </div>
+    <div class="team-grid">${d.members.map(m=>rMember(m,meta)).join('')}</div>
+  </div>
+</div>`;}
+
+function rLeads(){
+  const rows=[
+    {id:'overall',    role:'总负责人',         name:'Joyce Liang', loc:'CEO · Bay Area'},
+    {id:'tech',       role:'Tech 负责人',       name:'Jeff Lin',    loc:'Tech Lead · Seattle'},
+    {id:'marketing',  role:'Marketing 负责人',  name:'Iris Sui',    loc:'Marketing Lead · China'},
+    {id:'backoffice', role:'BackOffice 负责人', name:'Chelsea Zhu', loc:'BackOffice Lead · Bay Area'},
+  ];
+  return `<div class="leads-row">${rows.map(r=>{
+    const m=META[r.id];const d=findDept(r.id);
+    return `<div class="lead-card">
+  <div class="lead-accent" style="background:${m.color};"></div>
+  <div class="lead-role">${r.role}</div>
+  <div class="lead-name">${r.name}</div>
+  <div class="lead-dept">${r.loc}</div>
+  <span class="lead-badge" style="background:${m.light};color:${m.color};">${d?.pillar||''}</span>
+</div>`;}).join('')}</div>`;}
+
+function rPage(){
+  document.getElementById('app').innerHTML=
+    `<div class="cover">
+  <div class="cover-actions">
+    <button class="cover-btn" id="editBtn" data-act="editToggle">✏ 编辑</button>
+    <button class="cover-btn" data-act="exportHtml">↓ 导出</button>
+    ${isLocal?`<button class="cover-btn" id="publishBtn" data-act="publishGH">☁ 发布</button>
+    <button class="cover-btn" data-act="openHistory">🕐 历史</button>`:''}
+    <button class="cover-btn" data-act="reset">↺ 重置数据</button>
+  </div>
+  <div class="cover-label">NewGen Growth Ecosystem · 内部工作文件</div>
+  <h1>团队分工规划</h1>
+  <div class="cover-sub">2026年6月 · 基于6月5日会议讨论 · 推广上线目标 <strong style="color:#fff;">6月15日</strong></div>
+  <div class="cover-pills">
+    <div class="cover-pill"><span style="opacity:.5;margin-right:4px;">P1</span>Tech Growth Engine</div>
+    <div class="cover-pill"><span style="opacity:.5;margin-right:4px;">P2</span>Consumer Acquisition</div>
+    <div class="cover-pill"><span style="opacity:.5;margin-right:4px;">P3</span>Agent Growth Platform</div>
+    <div class="cover-pill"><span style="opacity:.5;margin-right:4px;">P4</span>Professional Referral</div>
+  </div>
+  <div class="cover-meta">v${data.version||'1.0.0'} · 最后更新 ${fmtDate(data.lastUpdated)}</div>
+</div>`
+  +rLeads()
+  +`<div class="sections">${data.departments.map(rDept).join('')}</div>`
+  +`<div class="legend">
+  <span class="legend-title">优先级</span>
+  <div class="legend-item"><span class="pbadge" style="background:#FDECEA;color:#C0392B;">6/15前</span>上线前完成</div>
+  <div class="legend-item"><span class="pbadge" style="background:#FEF4E4;color:#7D4D00;">本周</span>本周推进</div>
+  <div class="legend-item"><span class="pbadge" style="background:#ECF7EC;color:#245E2A;">持续</span>常态任务</div>
+  <div class="legend-item"><span class="pbadge" style="background:#F0EBF8;color:#5B2D90;">视需要</span>按情况执行</div>
+  <span class="legend-hint">按 E 进入编辑模式 · 点击标签切换优先级 · 拖拽换人 · Cmd/Ctrl+S 保存 · ↓ 导出版本快照</span>
+</div>`;
+  initSortables();
+  applyEditMode();
+}
+
+// ── Sortable ────────────────────────────────
+function makeSortableOnList(el){
+  const mid=el.dataset.mid;
+  if(_sortables[mid]){try{_sortables[mid].destroy();}catch(e){}}
+  _sortables[mid]=Sortable.create(el,{
+    group:'tasks', handle:'.drag-handle', animation:150,
+    ghostClass:'sortable-ghost', dragClass:'sortable-drag',
+    onEnd(evt){
+      const tid=evt.item.dataset.tid;
+      const fid=evt.from.dataset.mid;
+      const tid2=evt.to.dataset.mid;
+      const ni=evt.newIndex;
+      const fm=findMember(fid), tm=findMember(tid2);
+      if(!fm||!tm)return;
+      const idx=fm.todos.findIndex(t=>t.id===tid);
+      if(idx===-1)return;
+      const [task]=fm.todos.splice(idx,1);
+      evt.item.dataset.mid=tid2;
+      tm.todos.splice(ni,0,task);
+      save();
+    }
+  });
+}
+function initSortables(){
+  _sortables={};
+  document.querySelectorAll('.todo-list').forEach(makeSortableOnList);
+}
+
+// ── Events ──────────────────────────────────
+document.addEventListener('click',function(e){
+  const el=e.target.closest('[data-act]');
+  if(!el)return;
+  const act=el.dataset.act;
+
+  // Edit mode toggle
+  if(act==='editToggle'){setEditMode(!isEditMode);return;}
+
+  // Export HTML
+  if(act==='exportHtml'){exportHtml();return;}
+
+  // Publish to GitHub (Shift+click to reset stored token)
+  if(act==='publishGH'){publishToGitHub();return;}
+
+  // Version history
+  if(act==='openHistory'){openHistory();return;}
+  if(act==='closeHistory'){closeHistory();return;}
+  if(act==='rollback'){rollbackTo(el.dataset.path,el.dataset.ver,el);return;}
+
+  // Reset
+  if(act==='reset'){
+    if(confirm('确定重置所有数据？这将清除所有改动。')){
+      data=JSON.parse(JSON.stringify(DEF));save();rPage();
+    }
+    return;
+  }
+
+  // Toggle done
+  if(act==='chk'){
+    const item=el.closest('.todo-item');
+    const tid=item.dataset.tid, mid=item.dataset.mid;
+    const m=findMember(mid); const t=m?.todos.find(x=>x.id===tid);
+    if(!t)return;
+    t.done=!t.done;
+    item.classList.toggle('done',t.done);
+    el.classList.toggle('ck',t.done);
+    save(); return;
+  }
+
+  // Cycle priority
+  if(act==='cyc'){
+    const item=el.closest('.todo-item');
+    const tid=item.dataset.tid, mid=item.dataset.mid;
+    const m=findMember(mid); const t=m?.todos.find(x=>x.id===tid);
+    if(!t)return;
+    t.priority=PO[(PO.indexOf(t.priority)+1)%PO.length];
+    const v=PRI[t.priority];
+    el.textContent=v.l; el.style.background=v.bg; el.style.color=v.c;
+    save(); return;
+  }
+
+  // Delete todo
+  if(act==='del'){
+    const item=el.closest('.todo-item');
+    const tid=item.dataset.tid, mid=item.dataset.mid;
+    const m=findMember(mid);
+    if(!m)return;
+    m.todos=m.todos.filter(t=>t.id!==tid);
+    item.remove(); save(); return;
+  }
+
+  // Add todo
+  if(act==='addtodo'){
+    const mid=el.dataset.mid;
+    const m=findMember(mid); if(!m)return;
+    const nt={id:uid(),text:'新任务',priority:'week',done:false};
+    m.todos.push(nt); save();
+    const list=document.querySelector(`.todo-list[data-mid="${mid}"]`);
+    const tmp=document.createElement('div');
+    tmp.innerHTML=rTodo(nt,mid);
+    const nel=tmp.firstElementChild;
+    list.appendChild(nel);
+    makeSortableOnList(list);
+    const txt=nel.querySelector('.todo-text');
+    if(isEditMode) txt.setAttribute('contenteditable','true');
+    txt.focus(); document.execCommand('selectAll',false,null);
+    return;
+  }
+
+  // Delete key task
+  if(act==='delkt'){
+    const item=el.closest('.key-task-item');
+    const did=item.dataset.did, ki=parseInt(item.dataset.ki,10);
+    const d=findDept(did); if(!d)return;
+    d.keyTasks.splice(ki,1); save();
+    const meta=META[did];
+    const list=document.querySelector(`.key-tasks-list[data-did="${did}"]`);
+    list.innerHTML=d.keyTasks.map((t,i)=>rKeyTask(t,did,i,meta)).join('');
+    return;
+  }
+
+  // Add key task
+  if(act==='addkt'){
+    const did=el.dataset.did;
+    const d=findDept(did); if(!d)return;
+    d.keyTasks.push('新重点任务'); save();
+    const meta=META[did];
+    const i=d.keyTasks.length-1;
+    const list=document.querySelector(`.key-tasks-list[data-did="${did}"]`);
+    const tmp=document.createElement('div');
+    tmp.innerHTML=rKeyTask('新重点任务',did,i,meta);
+    const nel=tmp.firstElementChild;
+    list.appendChild(nel);
+    const txt=nel.querySelector('.keytask-text');
+    if(isEditMode) txt.setAttribute('contenteditable','true');
+    txt.focus(); document.execCommand('selectAll',false,null);
+    return;
+  }
+},true);
+
+// Save contenteditable on blur
+document.addEventListener('blur',function(e){
+  if(e.target.dataset.act==='etxt'){
+    const item=e.target.closest('.todo-item');
+    const tid=item?.dataset.tid, mid=item?.dataset.mid;
+    const m=findMember(mid); const t=m?.todos.find(x=>x.id===tid);
+    if(t){t.text=e.target.textContent.trim()||t.text; save();}
+  }
+  if(e.target.dataset.act==='ekt'){
+    const item=e.target.closest('.key-task-item');
+    const did=item?.dataset.did, ki=parseInt(item?.dataset.ki,10);
+    const d=findDept(did);
+    if(d&&!isNaN(ki)){d.keyTasks[ki]=e.target.textContent.trim()||d.keyTasks[ki]; save();}
+  }
+},true);
+
+// Keyboard shortcuts
+document.addEventListener('keydown',function(e){
+  // Cmd/Ctrl+S — save to localStorage
+  if((e.metaKey||e.ctrlKey)&&e.key==='s'){e.preventDefault();save();showToast();return;}
+  // E — toggle edit mode (only when not typing in a contenteditable)
+  if((e.key==='e'||e.key==='E')&&!e.target.getAttribute('contenteditable')&&!e.metaKey&&!e.ctrlKey){
+    setEditMode(!isEditMode);return;
+  }
+  // Enter confirms inline edit
+  if(e.key==='Enter'&&(e.target.dataset.act==='etxt'||e.target.dataset.act==='ekt')){
+    e.preventDefault();e.target.blur();
+  }
+},true);
+
+// ── Edit mode & Export ──────────────────────
+let isEditMode = false;
+
+function applyEditMode(){
+  document.body.classList.toggle('edit-mode',isEditMode);
+  document.querySelectorAll('.todo-text,.keytask-text').forEach(el=>{
+    if(isEditMode) el.setAttribute('contenteditable','true');
+    else el.removeAttribute('contenteditable');
+  });
+  const btn=document.getElementById('editBtn');
+  if(btn) btn.textContent=isEditMode?'💾 完成':'✏ 编辑';
+}
+
+function setEditMode(on){
+  isEditMode=on;
+  applyEditMode();
+  if(!on){save();showToast();}
+}
+
+function showToast(msg){
+  const t=document.getElementById('save-toast');
+  if(!t)return;
+  t.textContent=msg||'已保存 ✓';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{t.classList.remove('show');t.textContent='已保存 ✓';},1800);
+}
+
+function bumpVersion(v){
+  const parts=(v||'1.0.0').split('.').map(Number);
+  parts[2]=(parts[2]||0)+1;
+  return parts.join('.');
+}
+
+function downloadBlob(blob,filename){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function buildExportHtml(){
+  const appEl=document.getElementById('app');
+  const savedContent=appEl.innerHTML;
+  appEl.innerHTML='';
+  let html=document.documentElement.outerHTML;
+  appEl.innerHTML=savedContent;
+  return html.replace(/\/\*DEF_START\*\/[\s\S]*?\/\*DEF_END\*\//,
+    `/*DEF_START*/\nconst DEF = ${JSON.stringify(data)};\n/*DEF_END*/`);
+}
+
+function exportHtml(){
+  data.version=bumpVersion(data.version);
+  save();
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  const filename=`NewGen_Team_Interactive_v${data.version}_${stamp}.html`;
+  const blob=new Blob([buildExportHtml()],{type:'text/html'});
+  if(window.showSaveFilePicker){
+    window.showSaveFilePicker({
+      suggestedName:filename,
+      types:[{description:'HTML File',accept:{'text/html':['.html']}}]
+    }).then(h=>h.createWritable()).then(w=>w.write(blob).then(()=>w.close()))
+      .catch(err=>{if(err.name!=='AbortError') downloadBlob(blob,filename);});
+  } else {
+    downloadBlob(blob,filename);
+  }
+}
+
+function toBase64Utf8(str){
+  const bytes=new TextEncoder().encode(str);
+  let bin='';
+  for(let i=0;i<bytes.length;i+=8192) bin+=String.fromCharCode(...bytes.subarray(i,i+8192));
+  return btoa(bin);
+}
+
+// ── Local file sync (IndexedDB + File System Access API) ────
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('ng-store',1);
+    r.onupgradeneeded=e=>e.target.result.createObjectStore('kv');
+    r.onsuccess=e=>res(e.target.result);
+    r.onerror=()=>rej(r.error);
+  });
+}
+async function idbGet(key){
+  const db=await idbOpen();
+  return new Promise((res,rej)=>{
+    const r=db.transaction('kv').objectStore('kv').get(key);
+    r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+  });
+}
+async function idbSet(key,val){
+  const db=await idbOpen();
+  return new Promise((res,rej)=>{
+    const r=db.transaction('kv','readwrite').objectStore('kv').put(val,key);
+    r.onsuccess=()=>res();r.onerror=()=>rej(r.error);
+  });
+}
+
+async function updateLocalFile(html,version,stamp){
+  if(!window.showDirectoryPicker) return; // browser doesn't support API
+  try{
+    let dir=await idbGet('ng-local-dir');
+    if(dir){
+      let perm=await dir.queryPermission({mode:'readwrite'});
+      if(perm!=='granted') perm=await dir.requestPermission({mode:'readwrite'});
+      if(perm!=='granted') dir=null;
+    }
+    if(!dir){
+      // First time — ask user to select the project folder
+      dir=await window.showDirectoryPicker({id:'ng-working-dir',mode:'readwrite'});
+      await idbSet('ng-local-dir',dir);
+    }
+    // Overwrite working copy (plain filename)
+    const wh=await dir.getFileHandle('NewGen_Team_Interactive.html',{create:true});
+    const ww=await wh.createWritable(); await ww.write(html); await ww.close();
+    // Write versioned local snapshot
+    const vh=await dir.getFileHandle(`NewGen_Team_Interactive_v${version}_${stamp}.html`,{create:true});
+    const vw=await vh.createWritable(); await vw.write(html); await vw.close();
+  }catch(e){
+    if(e.name!=='AbortError') console.warn('Local file sync skipped:',e.message);
+  }
+}
+
+const REPO='LucaLinkAI/newgen-taskboard';
+
+function ghHeaders(){
+  const token=localStorage.getItem('ng-gh-token');
+  return token?{'Authorization':'Bearer '+token,'Content-Type':'application/json'}:null;
+}
+
+async function ghGet(path){
+  const h=ghHeaders();if(!h)throw new Error('No token');
+  const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{headers:h});
+  if(!r.ok)throw new Error('GitHub '+r.status+' '+r.statusText);
+  return r.json();
+}
+
+async function ghPut(path,content64,sha,message){
+  const h=ghHeaders();if(!h)throw new Error('No token');
+  const body={message,content:content64};
+  if(sha)body.sha=sha;
+  const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{method:'PUT',headers:h,body:JSON.stringify(body)});
+  if(!r.ok){const e=await r.json();throw new Error(e.message||r.status);}
+  return r.json();
+}
+
+async function publishToGitHub(){
+  const btn=document.getElementById('publishBtn');
+
+  const token=localStorage.getItem('ng-gh-token');
+  if(!token){alert('GitHub token not found.\nAdd it to config.local.js and reload.');return;}
+
+  data.version=bumpVersion(data.version);
+  save();
+  const html=buildExportHtml();
+  const content64=toBase64Utf8(html);
+
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+  if(btn){btn.textContent='⏳ 发布中...';btn.style.opacity='.6';}
+  try{
+    // Update index.html
+    const {sha}=await ghGet('index.html');
+    await ghPut('index.html',content64,sha,`publish v${data.version}`);
+
+    // Archive to versions/
+    await ghPut(`versions/v${data.version}_${stamp}.html`,content64,null,`archive v${data.version}`);
+
+    if(btn){btn.textContent='✓ 已发布';btn.style.opacity='';setTimeout(()=>{btn.textContent='☁ 发布';},3000);}
+    showToast('已推送 GitHub ✓');
+    updateLocalFile(html,data.version,stamp); // sync working copy + versioned local snapshot
+  }catch(err){
+    console.error(err);
+    if(btn){btn.textContent='✗ 失败';btn.style.opacity='';setTimeout(()=>{btn.textContent='☁ 发布';},3000);}
+    alert('发布失败: '+err.message);
+  }
+}
+
+// ── Version history ──────────────────────────
+function formatStamp(s){
+  // s = '20260605-143022'
+  const y=s.slice(0,4),mo=parseInt(s.slice(4,6)),d=parseInt(s.slice(6,8));
+  const h=s.slice(9,11),mi=s.slice(11,13);
+  return `${y}年${mo}月${d}日 ${h}:${mi}`;
+}
+
+function openHistory(){
+  document.getElementById('history-panel').classList.add('open');
+  document.getElementById('history-backdrop').classList.add('open');
+  loadHistory();
+}
+
+function closeHistory(){
+  document.getElementById('history-panel').classList.remove('open');
+  document.getElementById('history-backdrop').classList.remove('open');
+}
+
+async function loadHistory(){
+  const list=document.querySelector('#history-panel .hp-list');
+  list.innerHTML='<p class="hp-msg">加载中...</p>';
+
+  if(!localStorage.getItem('ng-gh-token')){
+    list.innerHTML='<p class="hp-msg">请先配置 GitHub Token<br>（点击 ☁ 发布 输入）</p>';
+    return;
+  }
+
+  try{
+    let files;
+    try{files=await ghGet('versions');}
+    catch(e){
+      if(e.message.includes('404')){list.innerHTML='<p class="hp-msg">暂无历史版本<br>发布后自动归档</p>';return;}
+      throw e;
+    }
+
+    if(!Array.isArray(files)||files.length===0){
+      list.innerHTML='<p class="hp-msg">暂无历史版本</p>';return;
+    }
+
+    const current=data.version||'1.0.0';
+    files.sort((a,b)=>b.name.localeCompare(a.name));
+
+    list.innerHTML=files.map(f=>{
+      const m=f.name.match(/v(\d+\.\d+\.\d+)_(\d{8}-\d{6})/);
+      const ver=m?m[1]:f.name.replace('.html','');
+      const ts=m?formatStamp(m[2]):'';
+      const isCurrent=ver===current;
+      return `<div class="hp-item${isCurrent?' current':''}">
+  <div class="hp-info">
+    <span class="hp-ver">v${ver}</span>
+    ${ts?`<span class="hp-ts">${ts}</span>`:''}
+    ${isCurrent?'<span class="hp-badge">当前版本</span>':''}
+  </div>
+  <button class="hp-rollback-btn" data-act="rollback" data-path="${f.path}" data-ver="${ver}"${isCurrent?' disabled':''}>
+    ${isCurrent?'当前':'回滚'}
+  </button>
+</div>`;
+    }).join('');
+  }catch(err){
+    list.innerHTML=`<p class="hp-msg">加载失败<br>${err.message}</p>`;
+  }
+}
+
+async function rollbackTo(path,ver,btn){
+  if(!confirm(`确定回滚到 v${ver}？\n\n这将覆盖当前线上版本并触发重新部署。`))return;
+
+  btn.textContent='回滚中...';btn.disabled=true;
+  try{
+    // Fetch old version (content is base64 from GitHub API)
+    const vData=await ghGet(path);
+    const content64=vData.content.replace(/\n/g,'');
+
+    // Get current index.html SHA
+    const {sha}=await ghGet('index.html');
+
+    await ghPut('index.html',content64,sha,`rollback to v${ver}`);
+
+    btn.textContent='✓ 已回滚';
+    showToast(`已回滚到 v${ver} ✓`);
+    // Refresh list to reflect new current (decode version from content)
+    setTimeout(loadHistory,800);
+  }catch(err){
+    btn.textContent='回滚';btn.disabled=false;
+    alert('回滚失败: '+err.message);
+  }
+}
+
+rPage();
+</script>
+
+</body></html>
