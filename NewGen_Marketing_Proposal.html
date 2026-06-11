@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewGen AI Marketing Proposal</title>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-light:#eff4ff; --blue-bg:#f5f8ff;
+    --green:#15803d; --green-light:#eefbf2;
+    --red:#b91c1c; --red-light:#fdf0f0;
+    --ink:#1a2233; --slate:#475569; --muted:#7a8699;
+    --line:#e6eaf1; --card:#ffffff; --bg:#f7f8fb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.7; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  /* ---- Hero ---- */
+  .hero{background:linear-gradient(135deg,#102a6b 0%,#1d4ed8 100%);color:#fff;padding:64px 0 56px;text-align:center}
+  .hero .wrap{max-width:880px}
+  .eyebrow{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.8;font-weight:600;margin-bottom:18px}
+  .hero h1{font-size:42px;line-height:1.2;font-weight:800;margin-bottom:16px;letter-spacing:-.01em}
+  .hero .sub{font-size:18px;opacity:.92;font-weight:400;max-width:720px;margin:0 auto}
+  .hero .tagline{margin-top:28px;display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+    padding:10px 22px;border-radius:999px;font-size:15px;font-weight:500}
+  /* ---- Section ---- */
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:none}
+  .sec-head{margin-bottom:32px}
+  .sec-num{display:inline-block;font-size:13px;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+  h2{font-size:28px;font-weight:800;letter-spacing:-.01em;margin-bottom:10px}
+  h2 .en{display:block;font-size:15px;font-weight:500;color:var(--muted);letter-spacing:.02em;margin-top:4px}
+  .lead{font-size:17px;color:var(--slate);max-width:820px}
+  h3{font-size:19px;font-weight:700;margin:0 0 6px}
+  /* ---- Pipeline ---- */
+  .pipeline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 4px}
+  .pipeline .node{background:var(--blue-light);color:var(--blue);font-weight:600;font-size:14px;padding:8px 16px;border-radius:8px;border:1px solid #d7e3ff}
+  .pipeline .arrow{color:var(--muted);font-weight:700}
+  /* ---- Cards ---- */
+  .grid{display:grid;gap:18px}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:0 1px 2px rgba(20,30,55,.04)}
+  .card .kicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  ul{list-style:none;margin:10px 0 0}
+  ul li{position:relative;padding-left:20px;margin-bottom:7px;color:var(--slate);font-size:15px}
+  ul li::before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+  .card.green ul li::before{background:var(--green)}
+  .card.red ul li::before{background:var(--red)}
+  /* ---- Step blocks ---- */
+  .step{display:flex;gap:22px;margin-bottom:26px;align-items:flex-start}
+  .step .badge{flex:0 0 56px;height:56px;width:56px;border-radius:14px;background:var(--blue);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800}
+  .step .body{flex:1;padding-top:2px}
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:13px;color:var(--slate);font-weight:500}
+  /* ---- Direction (color-coded) ---- */
+  .dir{border-radius:16px;padding:28px;margin-bottom:20px;border:1px solid var(--line)}
+  .dir.blue{background:var(--blue-bg);border-color:#dce7ff}
+  .dir.green{background:var(--green-light);border-color:#d4f0dd}
+  .dir.red{background:var(--red-light);border-color:#f6dada}
+  .dir-tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:12px;color:#fff}
+  .dir.blue .dir-tag{background:var(--blue)} .dir.green .dir-tag{background:var(--green)} .dir.red .dir-tag{background:var(--red)}
+  .dir h3{font-size:21px}
+  .dir .role{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:14px}
+  .dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:16px}
+  .dir-grid .col h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);margin-bottom:8px}
+  .brand-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px}
+  .brand{flex:1;min-width:260px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px}
+  .brand .name{font-size:18px;font-weight:800;color:var(--green)}
+  .brand .url{font-size:13px;color:var(--muted);margin-bottom:8px}
+  /* ---- Workflow agents ---- */
+  .flow-step{display:flex;gap:18px;padding:18px 0;border-bottom:1px dashed var(--line)}
+  .flow-step:last-child{border-bottom:none}
+  .flow-step .n{flex:0 0 40px;height:40px;width:40px;border-radius:50%;background:var(--blue-light);color:var(--blue);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+  .flow-step .t{flex:1}
+  .flow-step .t .nm{font-weight:700;font-size:16px}
+  .flow-step .t .nm small{color:var(--muted);font-weight:500;margin-left:6px}
+  .flow-step .t p{color:var(--slate);font-size:14px;margin-top:3px}
+  /* ---- MVP ---- */
+  .mvp{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .mvp .card{border-top:4px solid var(--blue)}
+  .mvp .card:nth-child(2){border-top-color:var(--green)}
+  .mvp .card:nth-child(3){border-top-color:var(--red)}
+  .tag-num{font-size:13px;font-weight:800;color:var(--blue);letter-spacing:.05em}
+  /* ---- Value table ---- */
+  .value{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .value .vcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px}
+  .value .vcard .who{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:6px}
+  /* ---- Footer ---- */
+  footer{background:#102a6b;color:#fff;text-align:center;padding:42px 0}
+  footer .big{font-size:20px;font-weight:700;line-height:1.5;max-width:860px;margin:0 auto}
+  footer .small{opacity:.7;font-size:13px;margin-top:18px}
+  @media(max-width:780px){
+    .grid-2,.grid-3,.dir-grid,.mvp,.value{grid-template-columns:1fr}
+    .hero h1{font-size:32px}
+    .step{flex-direction:column;gap:12px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">NewGen Growth Ecosystem · Internal Proposal</div>
+    <h1>NewGen AI Marketing SOP</h1>
+    <p class="sub">用 AI Agent 把保险、退休、税务内容营销 <strong>产品化、流程化、规模化</strong>。<br>
+    Productize, systematize, and scale insurance, retirement &amp; tax content marketing with AI agents.</p>
+    <div class="tagline">知识沉淀 → 内容创作 → 平台分发 → 线索转化 → 数据反馈 → 持续优化</div>
+  </div>
+</header>
+
+<!-- ===== Positioning ===== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">01 · 整体定位</span>
+      <h2>NewGen Marketing 的整体定位<span class="en">Not a traditional marketing team — an AI growth engine</span></h2>
+    </div>
+    <p class="lead">NewGen Marketing 不是传统市场部，而是一个 <strong>AI Knowledge Base + Content Creation Engine + Multi-channel Distribution System</strong>。核心目标不是"多发内容"，而是建立一个可以长期复用的 AI 内容生产与分发系统，让招募、产品获客、CPA 转介绍都进入同一个增长飞轮。</p>
+    <div class="pipeline">
+      <span class="node">知识沉淀</span><span class="arrow">→</span>
+      <span class="node">内容创作</span><span class="arrow">→</span>
+      <span class="node">平台分发</span><span class="arrow">→</span>
+      <span class="node">线索转化</span><span class="arrow">→</span>
+      <span class="node">数据反馈</span><span class="arrow">→</span>
+      <span class="node">持续优化</span>
+    </div>
+    <p class="lead" style="margin-top:18px">定位在生态图的 <strong>Tech Growth Engine / AI Marketing Agent</strong> 模块下，作为 NewGen 全生态的<strong>内容增长中枢</strong>。</p>
+  </div>
+</section>
+
+<!-- ===== Three-Step SOP ===== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">02 · AI Marketing SOP</span>
+      <h2>三步走：从知识库到分发<span class="en">A three-step SOP — Knowledge → Creation → Distribution</span></h2>
+    </div>
+
+    <div class="step">
+      <div class="badge">1</div>
+      <div class="body">
+        <h3>LLM Wiki 知识库 + 第二大脑</h3>
+        <p style="color:var(--slate)">先把 NewGen 的专业知识、产品资料、销售话术、合规边界全部结构化，作为所有内容创作的底座。</p>
+        <p style="margin-top:12px;font-weight:600;font-size:14px">输入：</p>
+        <div class="pill-row">
+          <span class="pill">Term w/ Living Benefits</span><span class="pill">IUL / VUL</span><span class="pill">FIA / Income Annuity</span>
+          <span class="pill">LTC / Linked Benefit</span><span class="pill">Carrier brochures</span><span class="pill">Product illustrations</span>
+          <span class="pill">Underwriting guides</span><span class="pill">Case studies</span><span class="pill">Tax / CPA materials</span>
+        </div>
+        <p style="margin-top:14px;font-weight:600;font-size:14px">AI 产出的知识库：</p>
+        <div class="pill-row">
+          <span class="pill">产品知识库</span><span class="pill">案例知识库</span><span class="pill">客户异议处理库</span>
+          <span class="pill">广告素材库</span><span class="pill">CPA 转介绍话术库</span><span class="pill">Agent 培训知识库</span><span class="pill">作者风格库</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="badge">2</div>
+      <div class="body">
+        <h3>文案和图片创作 SOP</h3>
+        <p style="color:var(--slate)">让 AI 不只是"写文章"，而是按照 NewGen 的品牌风格、作者习惯和不同营销目标生成内容 —— 专业但易懂，符合保险 / 税务的合规边界。</p>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card">
+            <div class="kicker">招募类模板 · NewGen Agency</div>
+            <ul>
+              <li>传统代理模式为什么越来越难</li>
+              <li>AI 时代的新型代理人</li>
+              <li>NewGen 如何赋能 agent</li>
+              <li>适合加入的三类人</li>
+              <li>副业 / 转型路径</li>
+            </ul>
+          </div>
+          <div class="card green">
+            <div class="kicker">产品类模板 · FindInsureWise / EasyRetire</div>
+            <ul>
+              <li>Living Benefits 科普</li>
+              <li>Term vs Whole Life 对比</li>
+              <li>Retirement Income 规划</li>
+              <li>Annuity 产品教育</li>
+              <li>SEO landing page / YouTube 脚本</li>
+            </ul>
+          </div>
+          <div class="card red">
+            <div class="kicker">CPA 合作类 · CBC Advisory</div>
+            <ul>
+              <li>保险 + 税务深度文章</li>
+              <li>高收入客户税务优化案例</li>
+              <li>Estate / retirement 整合</li>
+              <li>CPA 转介绍场景话术</li>
+              <li>知识星球深度内容</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:16px;font-weight:600;font-size:14px">批量产出形式：</p>
+        <div class="pill-row">
+          <span class="pill">公众号文章</span><span class="pill">小红书笔记</span><span class="pill">视频号 / YouTube 脚本</span>
+          <span class="pill">Blog / SEO 页面</span><span class="pill">Google Ads 文案</span><span class="pill">微信群图文</span>
+          <span class="pill">Agent 培训课件</span><span class="pill">CPA referral one-pager</span><span class="pill">短视频分镜</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="badge">3</div>
+      <div class="body">
+        <h3>内容排版和分发 SOP</h3>
+        <p style="color:var(--slate)">让 AI Agent 根据不同平台自动改写、排版、分发，而不是人工复制粘贴。每个平台有自己的内容规则。</p>
+        <div class="grid grid-2" style="margin-top:16px">
+          <div class="card">
+            <div class="kicker">公众号 · 深度教育</div>
+            <ul><li>标题 + 摘要 + 分段排版</li><li>重点加粗、插入案例</li><li>封面图 brief + 结尾 CTA</li></ul>
+          </div>
+          <div class="card">
+            <div class="kicker">小红书 · 招募 / 痛点</div>
+            <ul><li>小红书口吻改写</li><li>6–9 张图文卡片 + 标题钩子</li><li>hashtags + 评论区引导</li></ul>
+          </div>
+          <div class="card">
+            <div class="kicker">视频号 / YouTube · 产品教育</div>
+            <ul><li>脚本 + 分镜 + 字幕</li><li>标题 + 描述 + 封面文案</li><li>短视频切片</li></ul>
+          </div>
+          <div class="card">
+            <div class="kicker">Blog / SEO · 三大品牌官网</div>
+            <ul><li>关键词研究 + SEO title / meta</li><li>FAQ schema + internal linking</li><li>landing page copy + CTA block</li></ul>
+          </div>
+          <div class="card">
+            <div class="kicker">微信群 / 知识星球 · 社群</div>
+            <ul><li>社群短文改写 + 提炼 3 个重点</li><li>讨论问题 + 转介绍提示</li><li>跟进话术</li></ul>
+          </div>
+          <div class="card" style="background:var(--blue-bg);border-color:#dce7ff">
+            <div class="kicker">原则 · Compliance-first</div>
+            <ul><li>AI 生成 → 人工 review</li><li>AI 排版 → 人工确认</li><li>半自动发布，规避合规风险</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Three Directions ===== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">03 · 三大宣传方向</span>
+      <h2>三大宣传方向规划<span class="en">Recruiting · Consumer products · CPA referral network</span></h2>
+    </div>
+
+    <!-- Direction 1 -->
+    <div class="dir blue">
+      <span class="dir-tag">方向一 · 招募</span>
+      <h3>NewGen Agency 招募</h3>
+      <p class="role">AI 赋能的新型保险代理平台 — 帮 agent 从"单打独斗"变成"平台化作战"</p>
+      <div class="dir-grid">
+        <div class="col">
+          <h4>主打信息</h4>
+          <ul>
+            <li>人脉销售 → AI 内容获客时代</li>
+            <li>平台化作战，不只是卖保险</li>
+            <li>退休 / 税务 / 家庭保障综合顾问</li>
+            <li>AI 降低新人门槛、提高老 agent 产能</li>
+            <li>培训 + 内容 + 系统 + 社群 + 产品支持</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>主要渠道</h4>
+          <ul>
+            <li>公众号 / 小红书 / 视频号</li>
+            <li>微信社群 / Agent referral</li>
+            <li>NewGen Circle / 线上讲座</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>CTA</h4>
+          <ul>
+            <li>加入 NewGen Agency</li>
+            <li>预约 agent career call</li>
+            <li>参加线上说明会 / 加入 NewGen Circle</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direction 2 -->
+    <div class="dir green">
+      <span class="dir-tag">方向二 · 产品获客</span>
+      <h3>FindInsureWise + EasyRetire</h3>
+      <p class="role">面向消费者的数字获客品牌</p>
+      <div class="brand-row">
+        <div class="brand">
+          <div class="name">FindInsureWise</div>
+          <div class="url">www.findinsurewise.com · Term Life with Living Benefits</div>
+          <ul>
+            <li>不只身故赔付：重疾 / 慢性病 / 重大疾病生前保障</li>
+            <li>适合房贷、孩子教育、收入保护</li>
+            <li><strong>渠道：</strong>SEO/GEO · Google Ads · YouTube · Blog · 社群图文</li>
+            <li><strong>内容：</strong>What is living benefits · Term vs Whole · How much I need · 移民 / 父母 / 房贷保护</li>
+          </ul>
+        </div>
+        <div class="brand">
+          <div class="name" style="color:var(--blue)">EasyRetire</div>
+          <div class="url">www.easyretire.ai · Lifetime Income / Annuity / Retirement</div>
+          <ul>
+            <li>退休现金流、Lifetime income、市场风险保护</li>
+            <li>Income gap & tax-efficient retirement income</li>
+            <li><strong>渠道：</strong>SEO/GEO · YouTube · Ads · Webinar · CPA / advisor referral</li>
+            <li><strong>内容：</strong>Lifetime income · Annuity pros/cons · Sequence-of-return · RMD · SS + annuity strategy</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direction 3 -->
+    <div class="dir red">
+      <span class="dir-tag">方向三 · CPA 转介绍</span>
+      <h3>CBC Advisory Group — CPA Referral Network</h3>
+      <p class="role">保险、退休、税务规划的专业协作平台 · www.cbciefinancial.com — 不做"广告化"，做高信任、高专业度内容沉淀</p>
+      <div class="dir-grid">
+        <div class="col">
+          <h4>目标（让 CPA 觉得）</h4>
+          <ul>
+            <li>补足他们不做的保险 / 退休规划</li>
+            <li>懂税务逻辑，不会乱卖产品</li>
+            <li>帮助服务高净值客户</li>
+            <li>降低转介绍风险，客户体验专业可信</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>内容方向</h4>
+          <ul>
+            <li>Inherited IRA + charitable planning</li>
+            <li>Cash Balance Plan + life insurance</li>
+            <li>Roth conversion + annuity</li>
+            <li>Business owner / estate liquidity</li>
+            <li>Key person · Buy-sell funding</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>阵地 &amp; CTA</h4>
+          <ul>
+            <li>CPA 微信群 / 知识星球 / Blog</li>
+            <li>专题讲座 / 案例协作</li>
+            <li>Referral consultation · Submit client case</li>
+            <li>Download checklist · Co-host webinar</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Workflow ===== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">04 · AI Marketing Workflow</span>
+      <h2>建议做成一个 AI Marketing Workflow<span class="en">Seven chained agents — from raw input to optimized output</span></h2>
+    </div>
+    <div class="card">
+      <div class="flow-step"><div class="n">1</div><div class="t"><div class="nm">Content Input Agent<small>收集资料</small></div><p>Carrier PDF · brochure · webinar transcript · client case · existing article · YouTube transcript · CPA question · sales objection → 输出到 LLM Wiki。</p></div></div>
+      <div class="flow-step"><div class="n">2</div><div class="t"><div class="nm">Knowledge Processing Agent<small>整理知识</small></div><p>提炼产品卖点 · 建立 FAQ · 客户画像 · 提取风险点 · 生成合规提醒 · 标记适合的营销渠道。</p></div></div>
+      <div class="flow-step"><div class="n">3</div><div class="t"><div class="nm">Content Strategy Agent<small>判断方向</small></div><p>判断内容适合 招募 / FindInsureWise / EasyRetire / CBC，并匹配目标人群、平台、内容形式、CTA、发布节奏。</p></div></div>
+      <div class="flow-step"><div class="n">4</div><div class="t"><div class="nm">Content Creation Agent<small>生成初稿</small></div><p>Blog · 公众号 · 小红书 · 视频脚本 · 广告文案 · 微信群文案 · 图片 brief · Email newsletter。</p></div></div>
+      <div class="flow-step"><div class="n">5</div><div class="t"><div class="nm">Design &amp; Formatting Agent<small>排版图片</small></div><p>图文卡片 · Blog / YouTube thumbnail · 微信群海报 · PDF one-pager · social post · newsletter layout。</p></div></div>
+      <div class="flow-step"><div class="n">6</div><div class="t"><div class="nm">Distribution Agent<small>半自动发布</small></div><p>Website Blog · 公众号 · 小红书 · YouTube · 视频号 · Newsletter · 微信群 · 知识星球。</p></div></div>
+      <div class="flow-step"><div class="n">7</div><div class="t"><div class="nm">Analytics Agent<small>回收数据 &amp; 反向优化</small></div><p>阅读量 · 点击率 · 留资率 · 预约数 · 广告转化 · SEO ranking · 社群反馈 · CPA referral 数 · agent inquiry 数 → 反向优化内容库与模板。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MVP ===== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">05 · MVP 路线图</span>
+      <h2>建议的 MVP 版本<span class="en">Start small — three minimum viable releases</span></h2>
+    </div>
+    <div class="mvp">
+      <div class="card">
+        <div class="tag-num">MVP 1</div>
+        <h3 style="margin:6px 0 8px">LLM Wiki + 内容生成</h3>
+        <p style="color:var(--slate);font-size:14px">先解决"专业内容生产效率"。</p>
+        <ul>
+          <li>上传 carrier PDF</li>
+          <li>AI 自动总结产品 + 生成 FAQ</li>
+          <li>1 篇公众号 + 1 篇小红书图文</li>
+          <li>1 个 YouTube 脚本 + 1 条微信群文案</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag-num" style="color:var(--green)">MVP 2</div>
+        <h3 style="margin:6px 0 8px">三个核心模板库</h3>
+        <p style="color:var(--slate);font-size:14px">每套先做 10 个高频主题。</p>
+        <ul>
+          <li>A · Agent 招募模板库 → NewGen Agency</li>
+          <li>B · 产品获客模板库 → FindInsureWise / EasyRetire</li>
+          <li>C · CPA 合作模板库 → CBC Advisory Group</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag-num" style="color:var(--red)">MVP 3</div>
+        <h3 style="margin:6px 0 8px">半自动分发</h3>
+        <p style="color:var(--slate);font-size:14px">更适合保险 / 税务 / 金融，规避合规风险。</p>
+        <ul>
+          <li>AI 生成 → 人工 review</li>
+          <li>AI 排版 → 人工确认</li>
+          <li>半自动发布</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Value ===== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">06 · 核心价值</span>
+      <h2>这个项目的核心价值<span class="en">NewGen Marketing becomes a growth system</span></h2>
+    </div>
+    <div class="value">
+      <div class="vcard"><div class="who">对 Agent</div><p style="color:var(--slate)">提供内容、培训、获客和销售支持，让每个 agent 都有平台级的内容生产力。</p></div>
+      <div class="vcard"><div class="who">对 消费者</div><p style="color:var(--slate)">通过 FindInsureWise 和 EasyRetire 获得清晰、可信、可转化的教育内容。</p></div>
+      <div class="vcard"><div class="who">对 CPA</div><p style="color:var(--slate)">通过 CBC Advisory Group 建立专业信任，让 CPA 愿意把保险、退休、税务规划相关客户介绍过来。</p></div>
+      <div class="vcard"><div class="who">对 NewGen</div><p style="color:var(--slate)">把 marketing 从人工驱动，升级成 AI Agent 驱动的可复制 SOP —— 一个长期复用的增长飞轮。</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="big">One ecosystem: Tech Growth Engine + Consumer Acquisition + Agent Growth Platform + Professional Referral Network — powered by one AI Marketing SOP.</p>
+    <p class="small">NewGen AI Marketing Proposal · Internal · 2026</p>
+  </div>
+</footer>
+
+</body>
+</html>
